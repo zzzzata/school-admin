@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+/*
+*初始化云合同公司id
+*2019/9/20
+*
+*/
 @Controller
 @RequestMapping("contractCompany")
 public class ContractCompanyController extends AbstractController{
