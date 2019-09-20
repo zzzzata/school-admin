@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.renren.dao.TeachStudentFilesDao">
+    <select id="selectMaterialListByCourseId" resultType="io.renren.entity.TeachStudentFilesEntity">
+          select id,name from teach_student_files where course_id = #{courseId} and status = 1
+    </select>
+    <select id="selectTeachStudentFile"  resultType="io.renren.entity.TeachStudentFilesEntity">
+        select id,name from teach_student_files where id in
+        <foreach collection="array" open="(" close=")"  separator="," item="materialId">
+            #{materialId}
+        </foreach>
+    </select>
+    <select id="getList" resultType="io.renren.entity.TeachStudentFilesEntity">
+        select  * from teach_student_files
+    </select>
+    <select id="select" resultType="io.renren.entity.TeachStudentFilesEntity">
+        select * from teach_student_files where id = #{materialId}
+    </select>
+</mapper>

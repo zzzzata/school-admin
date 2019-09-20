@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.TeachClassplanFilesDao">
+
+	<insert id="save"  parameterType="io.renren.entity.TeachClassplanFilesEntity" useGeneratedKeys="true" keyProperty="number">
+		insert into `teach_classplan_files`
+		(
+			`id`,
+			`name`,
+			`file_Key`,
+			`create_time`,
+			`sys_user_id`,
+			`stage_code`,
+			`status`,
+			`classplan_id`,
+			`course_classplan_lives_id`,
+			`course_id`,
+			`product_id`
+		)
+		values
+		(
+			#{id},
+			#{name},
+			#{fileKey},
+			#{createTime},
+			#{sysUserId},
+			#{stageCode},
+			#{status},
+			#{classplanId},
+			#{courseClassplanLivesId},
+			#{courseId},
+			#{productId}
+		)
+	</insert>
+
+</mapper>

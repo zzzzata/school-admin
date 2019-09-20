@@ -1,0 +1,25 @@
+
+
+<div id="wechatMsgDetailLayDiv" style="display: none">
+
+<!-- 查询条件 -->
+    <div class="form-group"  style="margin:5px 10px 5px 10px;background: aliceblue" >
+<table  border="0">
+   <tr>
+       <td>总记录数:</td>
+       <td><span readonly="readonly" id="totalCount"></span></td>
+   </tr>
+   <tr>
+       <td>成功发送:</td>
+       <td width="200"><span readonly="readonly" id="successCount"></span>条</td>
+       <td>失败发送:</td>
+       <td><span readonly="readonly" id="failedCount"></span>条</td>
+   </tr>
+</table>
+    </div>
+    <div class="form-group">
+        <table id="wechatMsgDetailLay_jqGrid" ></table>
+        <table id="wechatMsgDetailLay_jqGridPager" ></table>
+    </div>
+</div>
+<script src="${rc.contextPath}/js/layer/wechatMsgDetailLay.js?_${date.systemTime}"></script>

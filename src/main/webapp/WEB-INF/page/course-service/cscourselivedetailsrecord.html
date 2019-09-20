@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>课次</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<table class="table table-condensed" border="0">
+			<tr border="0">
+				<td><label for="name">课程id</label></td>
+				<td><input type="text" class="form-control" v-model="q.courseId" @keyup.enter="query" @keyup.enter="query" placeholder="课程id"></td>
+				<td><label for="name">原课次id</label></td>
+				<td><input type="text" class="form-control" v-model="q.liveId" @keyup.enter="query" @keyup.enter="query" placeholder="原课次id"></td>
+				<td><label for="name">课次名称</label></td>
+				<td><input type="text" class="form-control" v-model="q.liveName" @keyup.enter="query" @keyup.enter="query" placeholder="课次名称"></td>
+				<td colspan="2">
+					<a class="btn btn-primary" @click="query"><i class='fa fa-search'></i>&nbsp;查询</a>
+					<a class="btn btn-primary" @click="clearQuery">重置</a>
+				</td>
+			</tr>
+		</table>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+						<div class="form-group" style="display:none">
+			   	<div class="col-sm-2 control-label">主键</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.liveRecordId" placeholder="主键"/>
+			    </div>
+		</div>
+								    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">原编号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.liveId" placeholder="原编号"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">课次名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.liveName" placeholder="课次名称"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">上期复习文件</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.reviewName" placeholder="上期复习文件"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">上期复习文件地址</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.reviewUrl" placeholder="上期复习文件地址"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">本次预习文件</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.prepareName" placeholder="本次预习文件"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">本次预习文件地址</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.prepareUrl" placeholder="本次预习文件地址"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">课堂资料文件</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.coursewareName" placeholder="课堂资料文件"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">课堂资料地址</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.coursewareUrl" placeholder="课堂资料地址"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">阶段id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.phaseId" placeholder="阶段id"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">阶段名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.phaseName" placeholder="阶段名称"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">创建时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.createTime" placeholder="创建时间"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">创建人</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.createPerson" placeholder="创建人"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">修改时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.updateTime" placeholder="修改时间"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">修改人</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.updatePerson" placeholder="修改人"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">删除 0：正常，1：删除</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.dr" placeholder="删除 0：正常，1：删除"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">序号</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.orderNum" placeholder="序号"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">课程id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.courseId" placeholder="课程id"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">同步状态，0：未同步；1：已同步</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csCourseLiveDetailsRecord.syncStatus" placeholder="同步状态，0：未同步；1：已同步"/>
+			    </div>
+			</div>
+										<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/course-service/cscourselivedetailsrecord.js?_${date.systemTime}"></script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>直播录播关联</title>
+    #parse("sys/header.html")
+</head>
+<body>
+<div id="app">
+    <div v-show="showList">
+        <div class="grid-btn">
+            <form class="form-inline" style="margin-top: 5px;">
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="选择课程/科目" @click="selCourse" readonly="readonly" v-model="relate.courseName">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="输入课次名称" v-model="relate.liveName">
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control" placeholder="输入录播课程名称" v-model="relate.recordName">
+                </div>
+                <a style="margin-left: 10px" class="btn btn-default" @click="clearQuery">重置</a>
+                <a class="btn btn-primary" @click="query"><i class='fa fa-search'></i>&nbsp;查询</a>
+                <br>
+                <div style="margin-top: 10px">
+                    <a class="btn btn-primary" @click="addRelate"><i class="fa fa-pencil-square-o"></i>&nbsp;新增</a>
+                    <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+                    <a class="btn btn-primary" @click="updateStatus(1,null)"><i class="fa fa-pencil-square-o"></i>&nbsp;删除</a>
+                    <a class="btn btn-primary" @click="updateStatus(null,1)"><i class="fa fa-pencil-square-o"></i>&nbsp;启用</a>
+                    <a class="btn btn-primary" @click="updateStatus(null,0)"><i class="fa fa-pencil-square-o"></i>&nbsp;停用</a>
+                    <a class="btn btn-primary" href="../courseLiveRelateRecord/exportCourseLiveRelateRecordTemplate"><i class="fa fa-pencil-square-o"></i>&nbsp;模板下载</a>
+                    <a class="btn btn-primary" @click="importData"><i class="fa fa-pencil-square-o"></i>&nbsp;批量导入</a>
+                    <a class="btn btn-danger"  href="../courseLiveRelateRecord/exportData" style="float: right;">导出</a>
+                </div>
+            </form>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">直播课次</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" style="cursor:pointer;" v-model="editorRelate.liveName" @click="selLive" readonly="readonly" :disabled="disabled" placeholder="选择课次"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">录播课程</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" style="cursor:pointer;" :title="editorRelate.recordName" v-model="editorRelate.recordName" @click="selRecord" readonly="readonly" placeholder="选择录播视频"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">状态</div>
+                <div class="col-sm-10">
+                    <input type="radio" value="1" v-model="editorRelate.state">启用
+                    <input type="radio" value="0" v-model="editorRelate.state">停用
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+    <!-- 课程列表 -->
+    <div id="courselayer" style="display: none;">
+        <form class="form-inline" style="margin-top: 5px;">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="输入课程名称" v-model="course.courseName">
+            </div>
+            <a class="btn btn-primary" @click="reloadJqGridCourse"><i class='fa fa-search'></i>&nbsp;查询</a>
+        </form>
+        <table id="jqGridCourse"></table>
+        <div id="jqGridPagerCourse"></div>
+    </div>
+    <!--直播列表-->
+    <div id="livelayer" style="display: none;">
+        <form class="form-inline" style="margin-top: 5px;">
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="输入课程名称" v-model="live.courseName">
+            </div>
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="输入直播课次名称" v-model="live.liveName">
+            </div>
+            <a class="btn btn-primary" @click="reloadJqGridLive"><i class='fa fa-search'></i>&nbsp;查询</a>
+        </form>
+        <table id="jqGridLive"></table>
+        <div id="jqGridPagerLive"></div>
+    </div>
+    <!--录播列表-->
+    <div id="recordlayer" style="display: none;">
+        <table id="jqGridRecord"></table>
+        <div id="jqGridPagerRecord"></div>
+    </div>
+    <!-- 上传文件弹窗 -->
+    <div id="uploadExcel" style="display: none;">
+        <form name="form_uploadImg" action="" enctype="multipart/form-data">
+            <input id="file_data"  type="file"  name="file_data" style="height: 35px; width: 200px;" />
+        </form>
+    </div>
+</div>
+<script src="${rc.contextPath}/js/logAtten/courseLiveRelateRecord.js?_${date.systemTime}"></script>
+</body>
+</html>

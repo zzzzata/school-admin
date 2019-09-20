@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hq.courses.dao.CsCourseRecordDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	cs_course_record.course_record_id AS courseRecordId ,cs_course_record.course_id AS courseId , 	cs_course_record.course_no AS courseNo , 	cs_course_record.course_name AS courseName , 	cs_course_record.product_id AS productId , 	cs_course_record.dept_id AS deptId , 	cs_course_record.status AS status , 	cs_course_record.dr AS dr , 	cs_course_record.remark AS remark , 	cs_course_record.update_time AS updateTime ,
+		cs_course_record.create_time AS createTime , 	cs_course_record.nc_id AS ncId , 	cs_course_record.lj_id AS ljId , 	cs_course_record.tk_id AS tkId , 	cs_course_record.adaptive_type AS adaptiveType , 	cs_course_record.audit_status AS auditStatus , 	cs_course_record.live_audit_status AS liveAuditStatus , 	cs_course_record.create_user_id AS createUserId	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE 1=1	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM cs_course_record AS cs_course_record
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  course_record_id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="com.hq.courses.entity.CsCourseRecordEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND course_record_id = #{courseRecordId}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="com.hq.courses.entity.CsCourseRecordEntity">
+		select
+		<include refid="base_column"/>
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+        <if test="courseId != null">
+            AND course_id = #{courseId}
+        </if>
+        <if test="courseNo != null and courseNo.trim() != ''">
+            AND course_no = #{courseNo}
+        </if>
+        <if test="courseName != null and courseName.trim() != ''">
+            AND course_name LIKE CONCAT('%',#{courseName},'%')
+        </if>
+        ORDER BY create_time DESC
+        <if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+        <if test="courseId != null">
+            AND course_id = #{courseId}
+        </if>
+        <if test="courseNo != null and courseNo.trim() != ''">
+            AND course_no = #{courseNo}
+        </if>
+        <if test="courseName != null and courseName.trim() != ''">
+            AND course_name LIKE CONCAT('%',#{courseName},'%')
+        </if>
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="com.hq.courses.entity.CsCourseRecordEntity" useGeneratedKeys="true" keyProperty="courseRecordId">
+		insert into cs_course_record
+		(
+			`course_id`,`course_no`,`course_name`,`product_id`,`dept_id`,`status`,`dr`,`remark`,`update_time`,`create_time`,`nc_id`,`lj_id`,`tk_id`,`adaptive_type`,`audit_status`,`live_audit_status`,`create_user_id`
+		)
+		values
+		(
+			#{courseId},#{courseNo},#{courseName},#{productId},#{deptId},#{status},#{dr},#{remark},#{updateTime},#{createTime},#{ncId},#{ljId},#{tkId},#{adaptiveType},#{auditStatus},#{liveAuditStatus},#{createUserId}
+		)
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="com.hq.courses.entity.CsCourseRecordEntity">
+		update cs_course_record 
+		<set>
+			<if test="courseNo != null">`course_no` = #{courseNo}, </if>
+			<if test="courseName != null">`course_name` = #{courseName}, </if>
+			<if test="productId != null">`product_id` = #{productId}, </if>
+			<if test="deptId != null">`dept_id` = #{deptId}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="dr != null">`dr` = #{dr}, </if>
+			<if test="remark != null">`remark` = #{remark}, </if>
+			<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="ncId != null">`nc_id` = #{ncId}, </if>
+			<if test="ljId != null">`lj_id` = #{ljId}, </if>
+			<if test="tkId != null">`tk_id` = #{tkId}, </if>
+			<if test="adaptiveType != null">`adaptive_type` = #{adaptiveType}, </if>
+			<if test="auditStatus != null">`audit_status` = #{auditStatus}, </if>
+			<if test="createUserId != null">`create_user_id` = #{createUserId}, </if>
+			<if test="liveAuditStatus != null">`live_audit_status` = #{liveAuditStatus}</if>
+		</set>
+		<include refid="base_where"/>
+		AND course_record_id = #{courseRecordId}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="com.hq.courses.entity.CsCourseRecordEntity">
+		UPDATE cs_course_record 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND course_record_id = #{id}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="com.hq.courses.entity.CsCourseRecordEntity">
+		UPDATE cs_course_record 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND course_record_id IN
+		<foreach item="courseId" collection="ids" open="(" separator="," close=")">
+			#{courseId}
+		</foreach>
+	</update>
+</mapper>

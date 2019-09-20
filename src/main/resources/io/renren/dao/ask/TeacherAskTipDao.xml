@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.renren.dao.ask.TeacherAskTipDao">
+
+    <sql id="base_column">
+        t.id as id,
+        t.tip_ids as tipIds,
+        t.unlimited_ask as unlimitedAsk,
+        t.create_user_name as createUserName,
+        t.create_user_id as createUserId,
+        t.create_time as createTime,
+        t.update_user_name as updateUserName,
+        t.update_user_id as updateUserId,
+        t.update_time as updateTime
+    </sql>
+    <!-- 通用查询条件 -->
+    <sql id="base_where">
+      where 1=1
+    </sql>
+
+    <!--新增-->
+    <insert id="insert" parameterType="io.renren.entity.ask.TeacherAskTipEntity">
+    insert into `teacher_ask_tip` (user_id, tip_ids,unlimited_ask,create_user_name,create_user_id,
+      create_time, update_user_name,update_user_id,update_time)
+    values (#{userId,jdbcType=BIGINT}, #{tipIds,jdbcType=VARCHAR},#{unlimitedAsk,jdbcType=TINYINT},
+      #{createUserName,jdbcType=VARCHAR}, #{createUserId,jdbcType=BIGINT}, #{createTime,jdbcType=DATE},
+      #{updateUserName,jdbcType=VARCHAR},#{updateUserId,jdbcType=BIGINT},#{updateTime,jdbcType=DATE})
+    </insert>
+
+    <!--更新-->
+    <update id="updateById" parameterType="io.renren.entity.ask.TeacherAskTipEntity">
+        UPDATE `teacher_ask_tip`
+        <set>
+          tip_ids = #{tipIds},
+          <if test="unlimitedAsk!=null"> unlimited_ask = #{unlimitedAsk},</if>
+          <if test="updateUserName!=null"> update_user_name = #{updateUserName},</if>
+          <if test="updateUserId!=null"> update_user_id = #{updateUserId}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <!-- 分页查询班主任提问标签权限集合 -->
+    <select id="queryTeacherAskTipList" resultType="io.renren.pojo.ask.TeacherAskTipPOJO">
+        SELECT s.`mobile`,s.`nick_name`,s.`user_id`,<include refid="base_column"/> FROM `sys_user` s
+        LEFT JOIN `teacher_ask_tip` t ON s.user_id = t.user_id
+        <where>
+            s.class_teacher = 1
+            <if test="nickName != null and nickName.trim() != ''">
+                and s.nick_name like concat('%',#{nickName},'%')
+            </if>
+            <if test="mobile != null and mobile.trim() != ''">
+                and s.mobile like concat('%',#{mobile},'%')
+            </if>
+            <if test="userId != null">
+                AND t.user_id = #{userId}
+            </if>
+            <if test="unlimitedAsk!=null">
+                <choose>
+                    <!-- 查询开通权限的教师 -->
+                    <when test="unlimitedAsk == 1">
+                        and t.unlimited_ask = 1
+                    </when>
+                    <!-- 查询未开通权限的教师 -->
+                    <when test="unlimitedAsk == 0">
+                        and (t.unlimited_ask = 0 or t.unlimited_ask is null)
+                    </when>
+                </choose>
+            </if>
+        </where>
+        ORDER BY t.update_time DESC,s.user_id
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
+    <!-- 查询教师班主任标签权限集合数据总量 -->
+    <select id="teacherAskTipListTotal" resultType="int">
+        SELECT count(1) FROM `sys_user` s
+        LEFT JOIN `teacher_ask_tip` t ON s.user_id = t.user_id
+        <where>
+            s.class_teacher = 1
+            <if test="nickName != null and nickName.trim() != ''">
+                and s.nick_name like concat('%',#{nickName},'%')
+            </if>
+            <if test="mobile != null and mobile.trim() != ''">
+                and s.mobile like concat('%',#{mobile},'%')
+            </if>
+            <if test="unlimitedAsk!=null">
+                <choose>
+                    <!-- 查询开通权限的教师 -->
+                    <when test="unlimitedAsk == 1">
+                        and t.unlimited_ask = 1
+                    </when>
+                    <!-- 查询未开通权限的教师 -->
+                    <when test="unlimitedAsk == 0">
+                        and (t.unlimited_ask = 0 or t.unlimited_ask is null)
+                    </when>
+                </choose>
+            </if>
+        </where>
+    </select>
+</mapper>

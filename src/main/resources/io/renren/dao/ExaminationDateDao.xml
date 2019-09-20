@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.ExaminationDateDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	examination_date.id AS id , 	examination_date.user_id AS userId , 	examination_date.order_id AS orderId , 	examination_date.course_id AS courseId , 	examination_date.userplan_class_detail_id AS userplanClassDetailId , 	examination_date.userplan_class_id AS userplanClassId , 	examination_date.user_plan_id AS userPlanId , 	examination_date.learn_state AS learnState , 	examination_date.exam_state AS examState , 	examination_date.exam_schedule_id AS examScheduleId , 	examination_date.dr AS dr , 	examination_date.create_time AS createTime , 	examination_date.update_time AS updateTime 	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE  examination_date.dr=0 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM examination_date AS examination_date
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  examination_date.id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.ExaminationDateEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryListPOJO" resultType="io.renren.pojo.ExaminationDatePOJO">
+		SELECT
+		examination_date.learn_state,
+		examination_date.exam_state,
+		examination_date.exam_schedule_id,
+		b.nick_name,
+		b.mobile,
+		c.id_card,
+		mall_order.pay_time,
+		mall_order.nc_code,
+		d.course_no,
+		d.course_name,
+		f.schedule_date,
+		h.nick_name as teacherName,
+		(select aa.area_name from mall_area aa where aa.area_id = mall_order.area_id) as areaName,
+		(select bb.class_name from mall_class bb where bb.class_id = mall_order.class_id) as className,
+		(select cc.classtype_name from mall_class_type cc where cc.classtype_id = mall_order.class_type_id) as classtypeName,
+		(select dd.level_name from mall_level dd where dd.level_id = mall_order.level_id) as levelName,
+		(select p.profession_name from mall_profession p where p.profession_id = mall_order.profession_id) as professionName,
+		(select sys_product.product_name from sys_product AS sys_product where sys_product.product_id =
+		mall_order.product_id) as productName
+		FROM
+		examination_date examination_date
+		LEFT JOIN users b on examination_date.user_id = b.user_id
+		LEFT JOIN record_info c on examination_date.user_id = c.user_id
+		LEFT JOIN mall_order mall_order on examination_date.order_id = mall_order.order_id
+		LEFT JOIN courses d on d.course_id = examination_date.course_id
+		LEFT JOIN mall_exam_schedule f on f.id = examination_date.exam_schedule_id
+		LEFT JOIN mall_class g on g.class_id=mall_order.class_id
+		LEFT JOIN sys_user h on g.user_id = h.user_id
+		<include refid="base_where"/>
+		and mall_order.dr = 0
+		<if test="examScheduleId != null">
+			and examination_date.exam_schedule_id = #{examScheduleId}
+		</if>
+		<if test="mobile != null">
+			and b.mobile = #{mobile}
+		</if>
+		<if test="nickName != null">
+			and b.nick_name = #{nickName}
+		</if>
+		<if test="courseNo != null">
+			and d.course_no = #{courseNo}
+		</if>
+		<if test="learnState != null">
+			and examination_date.learn_state = #{learnState}
+		</if>
+		<if test="examState != null">
+			and examination_date.exam_state = #{examState}
+		</if>
+		<if test="productId != null">
+			and mall_order.product_id= #{productId}
+		</if>
+		<if test="classId != null">
+			and mall_order.class_id = #{classId}
+		</if>
+		<if test="teacherId != null">
+			and h.user_id = #{teacherId}
+		</if>
+		<if test="areaId != null">
+			and mall_order.area_id= #{areaId}
+		</if>
+		<if test="classTypeId != null">
+			and mall_order.class_type_id= #{classTypeId}
+		</if>
+		<if test="professionId != null">
+			and mall_order.profession_id= #{professionId}
+		</if>
+		<if test="levelId != null">
+			and mall_order.level_id= #{levelId}
+		</if>
+		<if test="orderStartTime != null">
+			and mall_order.pay_time&gt;=  #{orderStartTime}
+		</if>
+		<if test="orderEndTime != null">
+			and mall_order.pay_time&lt;= #{orderEndTime}
+		</if>
+		<if test="courseId != null">
+			and examination_date.course_id= #{courseId}
+		</if>
+		<include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/>
+		<if test="mobile != null || nickName != null">
+			LEFT JOIN users b on examination_date.user_id = b.user_id
+		</if>
+		LEFT JOIN mall_order mall_order on examination_date.order_id = mall_order.order_id
+		<if test="courseNo != null">
+			LEFT JOIN courses d on d.course_id = examination_date.course_id
+		</if>
+		<if test="teacherId != null">
+			LEFT JOIN mall_class g on g.class_id=mall_order.class_id
+			LEFT JOIN sys_user h on g.user_id = h.user_id
+		</if>
+		<include refid="base_where"/>
+		and mall_order.dr = 0
+		<if test="examScheduleId != null">
+			and examination_date.exam_schedule_id = #{examScheduleId}
+		</if>
+		<if test="mobile != null">
+			and b.mobile = #{mobile}
+		</if>
+		<if test="nickName != null">
+			and b.nick_name = #{nickName}
+		</if>
+		<if test="courseNo != null">
+			and d.course_no = #{courseNo}
+		</if>
+		<if test="learnState != null">
+			and examination_date.learn_state = #{learnState}
+		</if>
+		<if test="examState != null">
+			and examination_date.exam_state = #{examState}
+		</if>
+		<if test="productId != null">
+			and mall_order.product_id= #{productId}
+		</if>
+		<if test="classId != null">
+			and mall_order.class_id = #{classId}
+		</if>
+		<if test="teacherId != null">
+			and h.user_id = #{teacherId}
+		</if>
+		<if test="areaId != null">
+			and mall_order.area_id= #{areaId}
+		</if>
+		<if test="classTypeId != null">
+			and mall_order.class_type_id= #{classTypeId}
+		</if>
+		<if test="professionId != null">
+			and mall_order.profession_id= #{professionId}
+		</if>
+		<if test="levelId != null">
+			and mall_order.level_id= #{levelId}
+		</if>
+		<if test="orderStartTime != null">
+			and mall_order.pay_time&gt;=  #{orderStartTime}
+		</if>
+		<if test="orderEndTime != null">
+			and mall_order.pay_time&lt;= #{orderEndTime}
+		</if>
+		<if test="courseId != null">
+			and examination_date.course_id= #{courseId}
+		</if>
+	</select>
+</mapper>

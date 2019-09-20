@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>推送模板消息排课关联表</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+            #if($shiro.hasPermission("wechatclassplantemplate:list"))
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.classplanName" @keyup.enter="query" placeholder="排课名称">
+            </div>
+
+            <a class="btn btn-default" @click="clearQuery">&nbsp;重置</a>
+            <a class="btn btn-primary" @click="query"><i class="fa fa-search"></i>&nbsp;查询</a>
+            #end
+			#if($shiro.hasPermission("wechatclassplantemplate:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			#if($shiro.hasPermission("wechatclassplantemplate:update"))
+			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			#end
+			#if($shiro.hasPermission("wechatclassplantemplate:delete"))
+			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			#end
+			<a class="btn btn-primary" @click="note"><i class="fa fa-play"></i>&nbsp;说明</a>
+
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+            <div class="form-group" style="display:none">
+			   	<div class="col-sm-2 control-label"></div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatClassplanTemplate.id" placeholder=""/>
+			    </div>
+		    </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">产品线</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model.trim="wechatClassplanTemplate.productName" readonly="readonly" placeholder="点击选择产品线" @click="productLayShow">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">微信公众号</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model.trim="wechatClassplanTemplate.wechatTitle" readonly="readonly" placeholder="点击选择微信公众号" @click="wechatAccountLayShow">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">消息模板</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model.trim="wechatClassplanTemplate.templateName" readonly="readonly" placeholder="点击选择消息模板" @click="wechatTemplateLayShow">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">排课名称</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model.trim="wechatClassplanTemplate.classplanName" readonly="readonly" placeholder="点击选择排课" @click="classplanLayShow">
+                </div>
+            </div>
+
+           <!--
+           现版本使用默认的上课提醒类型,后面有其他的模板再启用
+           <div class="form-group">
+			   	<div class="col-sm-2 control-label">模板类型(用于选择不同的推送模型): 1上课提醒(默认,暂时只有这种)</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatClassplanTemplate.templateType" placeholder="模板类型(用于选择不同的推送模型): 1上课提醒(默认,暂时只有这种)"/>
+			    </div>
+			</div>-->
+            <div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/wechat_msg/wechatclassplantemplate.js?_${date.systemTime}"></script>
+#parse("layer/productLay.html")
+#parse("layer/wechatAccountLay.html")
+#parse("layer/wechatTemplateLay.html")
+#parse("layer/classplanLay.html")
+</body>
+</html>

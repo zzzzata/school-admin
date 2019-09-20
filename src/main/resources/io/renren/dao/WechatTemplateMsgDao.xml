@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.WechatTemplateMsgDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	wechat_template_msg.id AS id , 	wechat_template_msg.appid AS appid , 	wechat_template_msg.template_id AS templateId , 	wechat_template_msg.template_name AS templateName , 	wechat_template_msg.template_type AS templateType , 	wechat_template_msg.send_content AS sendContent ,
+	wechat_template_msg.send_obj_type AS sendObjType , 	wechat_template_msg.send_obj_value AS sendObjValue , 	wechat_template_msg.send_time_type AS sendTimeType , 	wechat_template_msg.send_time_value AS sendTimeValue , 	wechat_template_msg.send_status AS sendStatus , wechat_template_msg.send_count AS sendCount ,	wechat_template_msg.dr AS dr , 	wechat_template_msg.product_id AS productId , 	wechat_template_msg.create_time AS createTime , 	wechat_template_msg.create_user AS createUser ,
+	wechat_template_msg.update_time AS updateTime , 	wechat_template_msg.update_user AS updateUser 	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE wechat_template_msg.dr=0 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM wechat_template_msg AS wechat_template_msg
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.WechatTemplateMsgEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="io.renren.entity.WechatTemplateMsgEntity">
+		select
+		<include refid="base_column"/>
+        ,users.nick_name as createUserName,
+        users1.nick_name AS updateUserName,
+        wechat_account.title,
+        (SELECT product_name FROM sys_product WHERE product_id = wechat_template_msg.product_id) AS productName
+        <include refid="base_from"/>
+        LEFT JOIN wechat_account wechat_account ON wechat_account.appid = wechat_template_msg.appid
+        LEFT JOIN sys_user users ON users.user_id = wechat_template_msg.create_user
+        LEFT JOIN sys_user users1 ON users1.user_id = wechat_template_msg.update_user
+		<include refid="base_where"/>
+        <if test="startTime != null and startTime.trim() != ''">
+            AND wechat_template_msg.send_time_value  > #{startTime}
+        </if>
+        <if test="endTime != null and endTime.trim() != ''">
+            AND wechat_template_msg.send_time_value  &lt; #{endTime}
+        </if>
+        <if test="productId != null and productId > 0">
+            AND wechat_template_msg.product_id = #{productId}
+        </if>
+        <!--发送失败-->
+        <if test="sendStatus != null and sendStatus == 2">
+            AND wechat_template_msg.send_status = #{sendStatus}
+        </if>
+        <!--已发送-->
+        <if test="sendStatus != null and sendStatus == 11">
+            AND wechat_template_msg.send_status =1 AND  wechat_template_msg.send_time_value &lt; now()
+        </if>
+        <!--待发送-->
+        <if test="sendStatus != null and sendStatus == 12">
+            AND wechat_template_msg.send_status =1 AND  wechat_template_msg.send_time_value > now()
+        </if>
+        <!--暂不发送-->
+        <if test="sendStatus != null and sendStatus == 0">
+            AND wechat_template_msg.send_status = #{sendStatus}
+        </if>
+        ORDER BY wechat_template_msg.create_time DESC
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/>
+        LEFT JOIN wechat_account wechat_account ON wechat_account.appid = wechat_template_msg.appid
+        LEFT JOIN users users ON users.user_id = wechat_template_msg.create_user
+        LEFT JOIN users users1 ON users1.user_id = wechat_template_msg.update_user
+		<include refid="base_where"/>
+        <if test="startTime != null and startTime.trim() != ''">
+            AND wechat_template_msg.send_time_value  > #{startTime}
+        </if>
+        <if test="endTime != null and endTime.trim() != ''">
+            AND wechat_template_msg.send_time_value  &lt; #{endTime}
+        </if>
+        <if test="productId != null and productId > 0">
+            AND wechat_template_msg.product_id = #{productId}
+        </if>
+        <!--发送失败-->
+        <if test="sendStatus != null and sendStatus == 2">
+            AND wechat_template_msg.send_status = #{sendStatus}
+        </if>
+        <!--已发送-->
+        <if test="sendStatus != null and sendStatus == 11">
+            AND wechat_template_msg.send_status =1 AND  wechat_template_msg.send_time_value &lt; now()
+        </if>
+        <!--待发送-->
+        <if test="sendStatus != null and sendStatus == 12">
+            AND wechat_template_msg.send_status =1 AND  wechat_template_msg.send_time_value > now()
+        </if>
+        <!--暂不发送-->
+        <if test="sendStatus != null and sendStatus == 0">
+            AND wechat_template_msg.send_status = #{sendStatus}
+        </if>
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="io.renren.entity.WechatTemplateMsgEntity">
+		insert into wechat_template_msg
+		(
+			  `id`,`appid`,`template_id`,`template_name`,`template_type`,`send_content`,`send_obj_type`,`send_obj_value`,`send_time_type`,`send_time_value`, `send_status`,`dr`,`product_id`,`create_time`,`create_user`,`update_time`,`update_user`
+		)
+		values
+		(
+			#{id},#{appid},#{templateId},#{templateName},#{templateType},#{sendContent},#{sendObjType},#{sendObjValue}, #{sendTimeType},#{sendTimeValue},#{sendStatus},0,#{productId},#{createTime},#{createUser}, #{updateTime},#{updateUser}
+		)
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.WechatTemplateMsgEntity">
+		update wechat_template_msg 
+		<set>
+			<if test="appid != null">`appid` = #{appid}, </if>
+			<if test="templateId != null">`template_id` = #{templateId}, </if>
+			<if test="templateName != null">`template_name` = #{templateName}, </if>
+			<if test="templateType != null">`template_type` = #{templateType}, </if>
+			<if test="sendContent != null">`send_content` = #{sendContent}, </if>
+			<if test="sendObjType != null">`send_obj_type` = #{sendObjType}, </if>
+			<if test="sendObjValue != null">`send_obj_value` = #{sendObjValue}, </if>
+			<if test="sendTimeType != null">`send_time_type` = #{sendTimeType}, </if>
+			<if test="sendTimeValue != null">`send_time_value` = #{sendTimeValue}, </if>
+			<if test="sendStatus != null">`send_status` = #{sendStatus}, </if>
+			<if test="dr != null">`dr` = #{dr}, </if>
+			<if test="productId != null">`product_id` = #{productId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="createUser != null">`create_user` = #{createUser}, </if>
+			<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+			<if test="updateUser != null">`update_user` = #{updateUser}</if>
+		</set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="io.renren.entity.WechatTemplateMsgEntity">
+		UPDATE wechat_template_msg 
+		<set> dr = 1,
+            <if test="updateTime != null">`update_time` = #{updateTime}, </if>
+            <if test="updateUser != null">`update_user` = #{updateUser}</if></set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="io.renren.entity.WechatTemplateMsgEntity">
+		UPDATE wechat_template_msg 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id IN 
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+
+
+    <update id="updateSendStatus">
+        UPDATE wechat_template_msg
+        <set>send_status = 2 </set>
+        <include refid="base_where"/>
+        AND id = #{id}
+    </update>
+
+    <update id="updateSendCount">
+        UPDATE wechat_template_msg
+        <set>send_count = #{sendCount} </set>
+        <include refid="base_where"/>
+        AND id = #{id}
+    </update>
+
+    <select id="queryContentById" resultType="string">
+        SELECT send_content FROM `wechat_template_msg` WHERE id = #{msgNo};
+    </select>
+</mapper>

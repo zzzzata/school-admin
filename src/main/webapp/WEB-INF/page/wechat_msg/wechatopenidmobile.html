@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>用户绑定微信openId记录表</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+            #if($shiro.hasPermission("wechatopenidmobile:list"))
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.mobile" @keyup.enter="query" placeholder="学员手机">
+            </div>
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.classplanName" readonly="readonly" @keyup.enter="query" placeholder="点击选择排课" @click="classplanLayShow">
+            </div>
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model="q.className" readonly="readonly" @keyup.enter="query" placeholder="点击选择班级" @click="classLayShow">
+            </div>
+            <div class="form-group col-sm-1">
+                <select class="form-control" v-model="q.status" id="sendStatus">
+                    <option value="-1">全部</option>
+                    <option value="0">未绑定</option>
+                    <option value="1">已绑定</option>
+                </select>
+            </div>
+            <a class="btn btn-default" @click="clearQuery">&nbsp;重置</a>
+            <a class="btn btn-primary" @click="query"><i class="fa fa-search"></i>&nbsp;查询</a>
+            <a class="btn btn-primary" @click="note"><i class="fa fa-search"></i>&nbsp;说明</a>
+            #end
+
+			#if($shiro.hasPermission("wechatopenidmobile:save"))
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+			#end
+			#if($shiro.hasPermission("wechatopenidmobile:update"))
+			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+			#end
+			#if($shiro.hasPermission("wechatopenidmobile:delete"))
+			<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;删除</a>
+			#end
+			#if($shiro.hasPermission("wechatopenidmobile:resume"))
+			<a class="btn btn-primary" @click="resume"><i class="fa fa-play"></i>&nbsp;恢复</a>
+			#end
+			#if($shiro.hasPermission("wechatopenidmobile:pause"))
+			<a class="btn btn-primary" @click="pause"><i class="fa fa-pause"></i>&nbsp;暂停</a>
+			#end
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+            <div class="form-group" style="display:none">
+			   	<div class="col-sm-2 control-label"></div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatOpenidMobile.id" placeholder=""/>
+			    </div>
+		    </div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">微信公众号id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatOpenidMobile.appid" placeholder="微信公众号id"/>
+			    </div>
+			</div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">微信openId</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatOpenidMobile.openid" placeholder="微信openId"/>
+			    </div>
+			</div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">用户手机</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatOpenidMobile.mobile" placeholder="用户手机"/>
+			    </div>
+			</div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">学员微信id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatOpenidMobile.wechatId" placeholder="学员微信id"/>
+			    </div>
+			</div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">学员微信昵称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatOpenidMobile.wechatNickname" placeholder="学员微信昵称"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">蓝鲸用户id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatOpenidMobile.userId" placeholder="蓝鲸用户id"/>
+			    </div>
+			</div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">创建时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="wechatOpenidMobile.createTime" placeholder="创建时间"/>
+			    </div>
+			</div>
+            <div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/wechat_msg/wechatopenidmobile.js?_${date.systemTime}"></script>
+#parse("layer/classplanLay.html")
+#parse("layer/classLay.html")
+</body>
+</html>

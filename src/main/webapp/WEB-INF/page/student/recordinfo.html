@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <title>统考成绩</title>
+    #parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <div v-show="showList">
+        <table class="table table-condensed" border="0">
+
+            <tr border="0">
+                <td><label for="name">学员姓名:</label></td>
+                <td><input type="text" class="form-control" v-model.trim="q.name" id="name"></td>
+
+                <td><label for="mobile">手机号:</label></td>
+                <td><input type="text" class="form-control" v-model.trim="q.mobile" id="mobile"></td>
+
+                <td><label for="teacherName">班主任</label></td>
+                <td>
+                    <input type="text" class="form-control" id="query-classTeacherName" v-model.trim="q.teacherName"
+                           readonly="readonly" placeholder="选择班主任" @click="classTeacherLayerShow">
+                </td>
+                <td><label for="name">省份</label></td>
+                <td><input type="text" class="form-control" v-model="q.areaName" readonly="readonly"
+                           @keyup.enter="query" placeholder="点击选择省份" @click="areaLayerShow"></td>
+                <td><label for="name">校区</label></td>
+                <td><input type="text" class="form-control" v-model="q.deptNameList" readonly="readonly"
+                           placeholder="点击选择部门" @click="deptLayerShowQuery"></td>
+
+                <td><label for="name">数据生成月份</label></td>
+                <td>
+                    <input type="text" class="createMonth form-control" id="createMonth" readonly="readonly"
+                           v-model="q.createMonth" @keyup.enter="query" placeholder="数据生成日期">
+                </td>
+            </tr>
+
+            <tr border="0">
+                <td><label for="name">班级</label></td>
+                <td><input type="text" class="form-control" v-model="q.className" @keyup.enter="query"
+                           readonly="readonly" placeholder="点击选择班级" @click="classLayerShowQuery"></td>
+                <td><label for="name">排课计划</label></td>
+                <td><input type="text" class="form-control" v-model="q.classplanName" readonly="readonly"
+                           placeholder="选择排课" @click="classplanLayerShow"></td>
+                <td><label for="name">联系状态</label></td>
+                <td>
+                    <select class="form-control" v-model="q.followStatus">
+                        <option value="">全部</option>
+                        <option value="0">未联系</option>
+                        <option value="1">已联系</option>
+                    </select>
+                </td>
+                <td><label for="name">回访状态</label></td>
+                <td>
+                    <select class="form-control" v-model="q.returnType">
+                        <option value="">全部</option>
+                        <option value="0">新生-未回访</option>
+                        <option value="5">新生-最新已回访</option>
+                        <option value="6">新生-全部已回访</option>
+                        <option value="2">新生-回访超期</option>
+                        <option value="1">老生-未回访</option>
+                        <option value="4">老生-已回访</option>
+                        <option value="3">未回访（新生+老生）</option>
+                    </select>
+                </td>
+                <td><label for="name">预计回访时间</label></td>
+                <td>
+                    <input type="text" class="expectTime form-control" id="expect_time" readonly="readonly"
+                           v-model="q.expectTime" @keyup.enter="query" placeholder="预计回访时间">
+                </td>
+                <td><label for="name">审批日期</label></td>
+                <td>
+                    <input type="text" class="Date form-control" id="approval_date" readonly="readonly"
+                           v-model="q.approvalDate" @keyup.enter="query" placeholder="审批日期">
+                </td>
+            </tr>
+            <tr border="0">
+                <td><label for="name">报名单号:</label></td>
+                <td><input type="text" class="form-control" v-model.trim="q.ncCode" id="ncCode"></td>
+
+                <td><label for="name">订单状态</label></td>
+                <td>
+                    <select class="form-control" v-model="q.dr">
+                        <option value="">全部</option>
+                        <option value="0">正常</option>
+                        <option value="1">删除</option>
+                        <option value="2">关闭</option>
+                    </select>
+                </td>
+
+                <td><label for="name">报读专业:</label></td>
+                <td><input type="text" class="form-control" v-model.trim="q.zy" id="zy"></td>
+                <td><label for="name">报读班型:</label></td>
+                <td><input type="text" class="form-control" v-model.trim="q.courseName" id="courseName"></td>
+
+                <td><label for="name">报名日期:</label></td>
+                <td><input type="text" class="Date form-control" id="startRegDate" readonly="readonly"
+                           v-model="q.startRegDate" @keyup.enter="query" placeholder="开始时间"></td>
+                <td>-</td>
+                <td><input type="text" class="Date form-control" id="endRegDate" readonly="readonly"
+                           v-model="q.endRegDate" @keyup.enter="query" placeholder="结束时间"></td>
+            </tr>
+
+            <tr border="0">
+                <td><label for="name">初级课程顾问:</label></td>
+                <td><input type="text" class="form-control" v-model.trim="q.consultant" id="consultant"></td>
+
+                <td><label for="name">产品线</label></td>
+                <td><input type="text" class="form-control" v-model="q.productName" @keyup.enter="query"
+                           readonly="readonly" placeholder="点击选择产品线" @click="productShowQuery"></td>
+
+                <td><label for="name">签署状态</label></td>
+                <td>
+                    <select class="form-control" v-model="q.cstatus">
+                        <option value="">全部</option>
+                        <option value="0">未签署</option>
+                        <option value="1">已签署</option>
+                        <option value="2">已驳回</option>
+                        <option value="3">无需签约</option>
+                    </select>
+                </td>
+
+                <td><label for="name">是否购买保险</label></td>
+                <td>
+                    <select class="form-control" v-model="q.isInsurant">
+                        <option value="">全部</option>
+                        <option value="Y">是</option>
+                        <option value="N">否</option>
+                    </select>
+                </td>
+
+                <td><label for="name">收款日期:</label></td>
+                <td><input type="text" class="Date form-control" id="startReceiveDate" readonly="readonly"
+                           v-model="q.startReceiveDate" @keyup.enter="query" placeholder="开始时间"></td>
+                <td>-</td>
+                <td><input type="text" class="Date form-control" id="endReceiveDate" readonly="readonly"
+                           v-model="q.endReceiveDate" @keyup.enter="query" placeholder="结束时间"></td>
+            </tr>
+
+            <tr border="0">
+                <td><label for="name">商品类型:</label></td>
+                <td><input type="text" class="form-control" v-model.trim="q.classType" id="classType"></td>
+            </tr>
+
+
+        </table>
+        <div class="grid-btn">
+            <a class="btn btn-primary" @click="query">查询</a>
+            <a class="btn btn-primary" @click="queryClear">清空条件</a>
+            #if($shiro.hasPermission("record:recordInfo:update"))
+            <a class="btn btn-primary" @click="update">修改</a>
+            <a class="btn btn-primary" @click="queryReturnVisit">查看回访信息</a>
+            <a class="btn btn-primary" @click="querySituation">查看学习情况</a>
+            <a class="btn btn-primary" @click="updateFollow">查看联系信息</a>
+            #end
+            <a class="btn btn-danger" @click="exportTemplate" style="float: right"><i class="fa fa-plus"></i>&nbsp;下载导入模板</a>
+            #if($shiro.hasPermission("record:recordInfo:importData"))
+            <a class="btn btn-danger" @click="importData" style="float: right"><i class="fa fa-plus"></i>&nbsp;导入</a>
+            #end
+            #if($shiro.hasPermission("record:recordInfo:exportData"))
+            <a class="btn btn-danger" @click="exportData" style="float: right"><i class="fa fa-plus"></i>&nbsp;导出</a>
+            #end
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+    <!--修改弹窗-->
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">学员姓名</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="info.name" disabled="true"/>
+                </div>
+            </div>
+            <!--productId-->
+            <input type="hidden" name="productId" value="productId" v-model="info.productId">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">性别</div>
+                <div class="col-sm-10">
+                    <!--    <input type="text" class="form-control" v-model="info.sex"  disabled="false"/> -->
+
+                    <label class="radio-inline">
+                        <input type="radio" name="sex" value="0" v-model.trim="info.sex"/> 女
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="sex" value="1" v-model.trim="info.sex"/> 男
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="sex" value="2" v-model.trim="info.sex"/> 保密
+                    </label>
+
+
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">身份证</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="info.idCard"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">年龄</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="info.age"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">QQ</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="info.qq"/>
+                </div>
+            </div>
+
+
+            <!--<div class="form-group">-->
+            <!--<div class="col-sm-2 control-label">每天可学习时间(min)</div>-->
+            <!--<div class="col-sm-10">-->
+            <!--<input type="text" class="form-control" v-model="info.studyTimeOfDay"  />-->
+            <!--</div>-->
+            <!--</div>-->
+
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label">是否结婚</div>
+                <div class="col-sm-10">
+                    <label class="radio-inline">
+                        <input type="radio" name="marriageStatus" value="0" v-model.trim="info.marriageStatus"/> 否
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="marriageStatus" value="1" v-model.trim="info.marriageStatus"/> 是
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">是否生育</div>
+                <div class="col-sm-10">
+                    <label class="radio-inline">
+                        <input type="radio" name="fertilityStatus" value="0" v-model.trim="info.fertilityStatus"/> 否
+                    </label>
+                    <label class="radio-inline">
+                        <input type="radio" name="fertilityStatus" value="1" v-model.trim="info.fertilityStatus"/> 是
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label">现工作岗位</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="info.postName"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">已有证书</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="info.accountingCertificates"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">小孩数量</div>
+                <div class="col-sm-10">
+                    <input type="number" min="0" onkeypress="return (/[\d]/.test(String.fromCharCode(event.keyCode)))" class="form-control" v-model="info.chirdCount"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">学员目标</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="info.studentTarget"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">正备考证书</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="info.certificate"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">教材寄送地址</div>
+                <div class="col-sm-10">
+                    <input size="50" type="text" class="form-control" v-model="info.sendAddress"/>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+    <!-- 上传文件弹窗 -->
+    <div id="uploadExcel" style="display: none;">
+        <form name="form_uploadImg" action="" enctype="multipart/form-data">
+            <input id="file_data" type="file" name="file_data" style="height: 35px; width: 200px;"/>
+        </form>
+    </div>
+    <!--查看联系信息弹窗-->
+    <div id="followStatusLayDiv" style="display: none;margin-top: 10px;">
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">学员手机号码</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="info.mobile" placeholder="学员手机号码" readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">学员联系状态</div>
+                <div class="col-sm-10">
+                    <select class="form-control" v-model="info.followStatus">
+                        <option value="0">未联系</option>
+                        <option value="1">已联系</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">联系跟进时间</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="info.followTime" placeholder="联系跟进时间" readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">跟进人</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="info.followPersonName" placeholder="跟进人" readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">联系内容</div>
+                <div class="col-sm-10">
+                    <input :readonly="info.followStatus == 0" type="text" class="form-control" v-model="info.followContent" placeholder="联系内容"/>
+                </div>
+            </div>
+        </form>
+    </div>
+<!--学习情况弹窗-->
+    <div id="situastionInfoLayDiv" style="display:none;">
+        <form class="form-horizontal">
+            <div class="form-group" style="display:none">
+                <div class="col-sm-2 control-label">编号</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="learningSituation.id" placeholder="编号"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">报考课程</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="learningSituation.courseName" placeholder="报考课程"
+                           readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">参考日期</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control referenceDate" v-model="learningSituation.referenceDate"
+                           placeholder="参考日期（格式如：2019-05）"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">数据生成日期</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="learningSituation.createMonth" placeholder="数据生成日期"
+                           readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">听课完成率</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="learningSituation.attendPer" placeholder="听课完成率"
+                           readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">作业达标率</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="learningSituation.jobPer" placeholder="作业达标率"
+                           readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">班主任评价</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="learningSituation.teacherAssess"
+                           placeholder="班主任评价"/>
+                </div>
+            </div>
+            <div class="form-group" style="display:none">
+                <div class="col-sm-2 control-label">校区协助</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="learningSituation.schoolAssist"
+                           placeholder="校区协助"/>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!--查看回访信息弹窗-->
+    <div id="returnVisitLayDiv" style="display:none;">
+        <form class="form-horizontal">
+            <div class="form-group" style="display:none">
+                <div class="col-sm-2 control-label">编号</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="returnVisit.id" placeholder="编号"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">预计回访日期</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="returnVisit.expectTime" placeholder="预计回访日期"
+                           readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">回访状态</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="returnVisit.returnStatus" placeholder="回访状态"
+                           readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">学员手机号码</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="returnVisit.mobile" placeholder="学员手机号码" readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">回访内容</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="returnVisit.returnContent" placeholder="回访内容"/>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="returnVisitSaveLayDiv" style="display:none;">
+        <form class="form-horizontal">
+            <div class="form-group" style="display:none;">
+                <div class="col-sm-2 control-label">报读主键</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="returnVisit.recordSignId" placeholder="报读主键"
+                           readonly/>
+                </div>
+            </div>
+            <div class="form-group" style="display:none;">
+                <div class="col-sm-2 control-label">学员id</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="returnVisit.userId" placeholder="学员id" readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">学员手机号码</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="returnVisit.mobile" placeholder="学员手机号码" readonly/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">回访内容</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="returnVisit.returnContent" placeholder="回访内容"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="${rc.contextPath}/js/student/recordinfo.js?_${date.systemTime}"></script>
+#parse("layer/areaLay.html")
+#parse("layer/deptQueryLay.html")
+#parse("layer/classLay.html")
+#parse("layer/teacherLay.html")
+#parse("layer/learnSituastionLay.html")
+#parse("layer/returnVisitLay.html")
+#parse("layer/classplanLay.html")
+#parse("layer/productLay.html")
+</body>
+</html>

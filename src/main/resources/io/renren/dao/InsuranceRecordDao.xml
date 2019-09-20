@@ -1,0 +1,551 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.InsuranceRecordDao">
+
+
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+
+	s.insurance_record_id as insuranceRecordId,
+	s.order_id as
+	orderId,
+	s.source_order_id as sourceOrderId,
+	s.user_id as userId,
+	s.nc_id as ncId,
+	s.nc_code as ncCode,
+	s.nc_user_id as ncUserId,
+	s.nc_commodity_id as ncCommodityId,
+	s.nc_commodity_name as
+	ncCommodityName,
+	s.nc_record_name as ncRecordName,
+	s.nc_record_code as
+	ncRecordCode,
+	s.id_type as idType,
+	s.id_number as idNumber,
+	s.major_code
+	as majorCode,
+	s.major_name as majorName,
+	s.subject_qty as subjectQty,
+	s.tuition_fee as tuitionFee,
+	s.premium as premium,
+	s.compensation_amount as compensationAmount,
+	s.insurance_status as
+	insuranceStatus,
+	s.yh_order_code as yhOrderCode,
+	s.policy_no as
+	policyNo,
+	s.effect_date as effectDate,
+	s.expire_date as expireDate,
+
+	s.exam_area as examArea,
+	s.exam_date as examDate,
+	s.product_code as productCode,
+	s.project_code as
+	projectCode,
+	s.project_name as projectName,
+	s.insurance_info_id as insuranceInfoId,
+	s.insurance_type as insuranceType,
+	s.dr as dr,
+	s.ts as ts,
+	s.sync_time as syncTime,
+	s.send_time as sendTime,
+	s.total_days as totalDays,
+	s.watch_days as watchDays,
+	s.attendance_days as attendanceDays,
+
+	s.contract_status contractStatus,
+	s.template_id templateId,
+	s.signer_id signerId,
+	s.product_id productId,
+	s.creation_time as creationTime,
+	s.pass_time as passTime,
+	s.pass_status as passStatus
+
+	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+		where s.dr=0
+	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+		from insurance_record s
+	</sql>
+	<sql id="pojo_where">
+		<if test='orderNo != null'>and mall_order.`order_no` = #{orderNo}  </if>
+		<if test='ncCode != null'>and s.`nc_code` = #{ncCode}  </if>
+		<if test='mobile != null'>and users.`mobile` = #{mobile}  </if>
+		<if test='nickName != null'>and users.`nick_name` = #{nickName}  </if>
+		<if test='insuranceStatus != null'> and `insurance_status` = #{insuranceStatus}
+		</if>
+		<if test='contractStatus != null'> and `contract_status` = #{contractStatus}
+		</if>
+		<if test='passStatus != null'> and `pass_status` = #{passStatus}
+		</if>
+		<if test='teacherId != null'> and sys_user.user_id = #{teacherId}
+		</if>
+		<!-- 部门 -->
+		<if test="deptIdList != null and deptIdList.size() > 0">
+			and mall_order.dept_id in
+			<foreach item="deptId" collection="deptIdList" open="(" separator="," close=")">
+				#{deptId}
+			</foreach>
+		</if>
+	</sql>
+
+
+	<sql id="base_query">
+		<if test='insuranceRecordId != null'> and `insurance_record_id` = #{insuranceRecordId}  </if>
+		<if test='orderId != null'>and `order_id` = #{orderId}  </if>
+		<if test='sourceOrderId != null'>and `source_order_id` = #{sourceOrderId}  </if>
+		<if test='userId != null'>and `user_id` = #{userId}  </if>
+		<if test='ncId != null'>and `nc_id` = #{ncId}  </if>
+		<if test='ncCode != null'>and s.`nc_code` = #{ncCode}  </if>
+		<if test='ncUserId != null'>and `nc_user_id` = #{ncUserId}  </if>
+ 		<if test='insuranceStatus != null'>and `insurance_status` = #{insuranceStatus}  </if>
+		<if test='yhOrderCode != null'>and `yh_order_code` = #{yhOrderCode}  </if>
+		<if test='policyNo != null'>and `policy_no` = #{policyNo}  </if>
+		<if test='insuranceInfoId != null'>and `insurance_info_id` = #{insuranceInfoId}  </if>
+		<if test='insuranceType != null'>and `insurance_type` = #{insuranceType}  </if>
+        <if test='passStatus != null'>and `pass_status` = #{passStatus}  </if>
+        <!-- 部门 -->
+		<if test="orderIds != null  ">
+			and `order_id` in
+			<foreach item="orderId" collection="orderIds" open="(" separator="," close=")">
+				#{orderId}
+			</foreach>
+		</if>
+
+	</sql>
+
+
+
+	<!--根据ID查询 -->
+	<select id="queryObject" resultType="io.renren.entity.InsuranceRecordEntity">
+		select
+		<include refid="base_column" />
+		<include refid="base_from" />
+
+		<include refid="base_where" />
+		AND s.insurance_record_id = #{insuranceRecordId}
+	</select>
+
+	<!--分页列表 -->
+	<select id="queryList" resultType="io.renren.entity.InsuranceRecordEntity">
+		select
+		<include refid="base_column" />
+		<include refid="base_from" />
+		
+        <if test="notDr !=null"><!--  是否不用dr  -->
+        where  1=1 
+        </if>
+         <if test="notDr ==null">        
+		<include refid="base_where" />
+        </if>
+        
+		<include refid="base_query" />
+
+
+		order by s.insurance_record_id desc
+		<if test="offset != null and limit != null  ">
+			limit #{offset}, #{limit}
+		</if>
+
+
+
+
+	</select>
+		<!--分页列表 -->
+	<select id="queryListPOJO" resultType="io.renren.pojo.InsuranceRecordPOJO">
+		select
+		s.insurance_record_id AS insuranceRecordId , s.user_id AS userId ,	s.nc_code AS ncCode ,
+		s.nc_commodity_name AS ncCommodityName , 	s.nc_record_name AS ncRecordName , 	s.id_number AS idNumber ,
+		s.major_name AS majorName , 	s.subject_qty AS subjectQty , 	s.tuition_fee AS tuitionFee , s.compensation_amount as compensationAmount,
+		s.premium AS premium ,  	s.project_name AS projectName , 	s.insurance_type AS insuranceType ,
+		s.creation_time AS creationTime ,s.insurance_status AS insuranceStatus , 	s.yh_order_code AS yhOrderCode ,
+		s.policy_no AS policyNo , 	s.effect_date AS effectDate , 	s.expire_date AS expireDate,users.nick_name AS nickName,
+		s.total_days as totalDays, s.watch_days as watchDays,
+		s.contract_status,s.contract_id,s.signer_id,s.contract_ts,
+		s.attendance_days as attendanceDays,
+        s.pass_time as passTime,
+        s.pass_status as passStatus,
+		users.mobile AS mobile,mall_area.area_name AS areaName,mall_order.order_no AS orderNo,
+		(select sys_dept.name from sys_dept AS sys_dept where sys_dept.dept_id = mall_order.dept_id ) as deptName,
+		sys_user.nick_name as teacherNickName
+		<include refid="base_from" />
+		left join users on users.user_id=s.user_id
+		left join mall_area on mall_area.area_id=s.exam_area
+		left join mall_order on mall_order.order_id=s.order_id
+		LEFT JOIN mall_class on mall_order.class_id = mall_class.class_id
+		LEFT JOIN sys_user on mall_class.user_id = sys_user.user_id
+		<include refid="base_where" />
+		<include refid="pojo_where" />
+		order by s.insurance_record_id desc
+		<if test="offset != null and limit != null  ">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数 -->
+	<select id="queryTotal" resultType="int">
+
+		select count(0)
+		<include refid="base_from" />
+		<include refid="base_where" />
+		<include refid="base_query" />
+	</select>
+	
+	<!--分页总数 -->
+	<select id="queryPOJOTotal" resultType="int">
+
+		select count(0)
+		<include refid="base_from" />
+		left join users on users.user_id=s.user_id
+		left join mall_order on mall_order.order_id=s.order_id
+		LEFT JOIN mall_class on mall_order.class_id = mall_class.class_id
+		LEFT JOIN sys_user on mall_class.user_id = sys_user.user_id
+		<include refid="base_where" />
+		<include refid="pojo_where" />
+	</select>
+
+
+
+<select id="getSendTime" resultType="Date">
+
+		 select  d.send_time from insurance_record d 
+		 where d.dr=0 
+   and d.send_time>=#{today}
+   and d.user_id=#{userId} 
+ 
+ 
+ order by send_time desc limit 1 
+ 
+	</select>
+
+
+
+
+	<!--新增 -->
+	<insert id="save" parameterType="io.renren.entity.InsuranceRecordEntity"
+		useGeneratedKeys="true" keyProperty="insuranceRecordId">
+	insert into insurance_record
+	(
+	`insurance_record_id`,
+	`order_id`,
+	`source_order_id`,
+	`user_id`,
+	`nc_id`,
+	`nc_code`,
+	`nc_user_id`,
+	`nc_commodity_id`,
+	`nc_commodity_name`,
+	`nc_record_name`,
+	`nc_record_code`,
+	`id_type`,
+	`id_number`,
+	`major_code`,
+	`major_name`,
+	`subject_qty`,
+	`tuition_fee`,
+	`premium`,
+	`compensation_amount`,
+	`insurance_status`,
+	`yh_order_code`,
+	`policy_no`,
+	`effect_date`,
+	`expire_date`,
+	`exam_area`,
+	`exam_date`,
+	`product_code`,
+	`project_code`,
+	`project_name`,
+	`insurance_info_id`,
+	`insurance_type`,
+	`dr`,
+	`ts`,
+	`sync_time`,
+	`send_time`,
+	`total_days`,
+	`watch_days`, 
+	`template_id`,
+	`signer_id`,
+	`product_id`,
+
+
+	`creation_time`
+
+	)
+	values
+	(
+	#{insuranceRecordId},
+	#{orderId},
+	#{sourceOrderId},
+	#{userId},
+	#{ncId},
+	#{ncCode},
+	#{ncUserId},
+	#{ncCommodityId},
+	#{ncCommodityName},
+	#{ncRecordName},
+	#{ncRecordCode},
+	#{idType},
+	#{idNumber},
+	#{majorCode},
+	#{majorName},
+	#{subjectQty},
+	#{tuitionFee},
+	#{premium},
+	#{compensationAmount},
+	#{insuranceStatus},
+	#{yhOrderCode},
+	#{policyNo},
+	#{effectDate},
+	#{expireDate},
+	#{examArea},
+	#{examDate},
+	#{productCode},
+	#{projectCode},
+	#{projectName},
+	#{insuranceInfoId},
+	#{insuranceType},
+	#{dr},
+	#{ts},
+	#{syncTime},
+	#{sendTime},
+	#{totalDays},
+	#{watchDays}, 
+	#{templateId},
+	#{signerId},
+	#{productId},
+	#{creationTime}
+
+	)
+
+
+	</insert>
+
+	<!--修改 -->
+	<update id="update" parameterType="io.renren.entity.InsuranceRecordEntity">
+		update insurance_record
+		<set>
+
+			<if test='insuranceRecordId != null'>`insurance_record_id` = #{insuranceRecordId}, </if>
+			<if test='orderId != null'>`order_id` = #{orderId}, </if>
+			<if test='sourceOrderId != null'>`source_order_id` = #{sourceOrderId}, </if>
+			<if test='userId != null'>`user_id` = #{userId}, </if>
+			<if test='ncId != null'>`nc_id` = #{ncId}, </if>
+			<if test='ncCode != null'>`nc_code` = #{ncCode}, </if>
+			<if test='ncUserId != null'>`nc_user_id` = #{ncUserId}, </if>
+			<if test='ncCommodityId != null'>`nc_commodity_id` = #{ncCommodityId}, </if>
+			<if test='ncCommodityName != null'>`nc_commodity_name` = #{ncCommodityName}, </if>
+			<if test='ncRecordName != null'>`nc_record_name` = #{ncRecordName}, </if>
+			<if test='ncRecordCode != null'>`nc_record_code` = #{ncRecordCode}, </if>
+			<if test='idType != null'>`id_type` = #{idType}, </if>
+			<if test='idNumber != null'>`id_number` = #{idNumber}, </if>
+			<if test='majorCode != null'>`major_code` = #{majorCode}, </if>
+			<if test='majorName != null'>`major_name` = #{majorName}, </if>
+			<if test='subjectQty != null'>`subject_qty` = #{subjectQty}, </if>
+			<if test='tuitionFee != null'>`tuition_fee` = #{tuitionFee}, </if>
+			<if test='premium != null'>`premium` = #{premium}, </if>	
+			<if test='compensationAmount != null'>`compensation_amount` = #{compensationAmount}, </if> 
+			<if test='insuranceStatus != null'>`insurance_status` = #{insuranceStatus}, </if>
+			<if test='yhOrderCode != null'>`yh_order_code` = #{yhOrderCode}, </if>
+			<if test='policyNo != null'>`policy_no` = #{policyNo}, </if>
+			<if test='effectDate != null'>`effect_date` = #{effectDate}, </if>
+			<if test='expireDate != null'>`expire_date` = #{expireDate}, </if> 
+			<if test='examArea != null'>`exam_area` = #{examArea}, </if>
+			<if test='examDate != null'>`exam_date` = #{examDate}, </if>
+			<if test='productCode != null'>`product_code` = #{productCode}, </if>
+			<if test='projectCode != null'>`project_code` = #{projectCode}, </if>
+			<if test='projectName != null'>`project_name` = #{projectName}, </if>
+			<if test='insuranceInfoId != null'>`insurance_info_id` = #{insuranceInfoId}, </if>
+			<if test='insuranceType != null'>`insurance_type` = #{insuranceType}, </if> 
+			<if test='dr != null'>`dr` = #{dr}, </if>
+	                <if test='ts != null'>`ts` = #{ts}, </if>
+			<if test='syncTime != null'>`sync_time` = #{syncTime},  </if>
+			<if test='sendTime != null'>`send_time` = #{sendTime} , </if>
+			<if test='totalDays != null'>`total_days` = #{totalDays} , </if>
+			<if test='watchDays != null'>`watch_days` = #{watchDays} , </if>
+			<if test='contractStatus != null'>`contract_status` = #{contractStatus} , </if>
+			<if test='templateId != null'>`template_id` = #{templateId} , </if>
+			<if test='signerId != null'>`signer_id` = #{signerId} , </if>
+			<if test='productId != null'>`product_id` = #{productId} , </if>
+			<if test='passStatus != null'>`pass_status` = #{passStatus} , </if>
+							 
+							
+							
+							
+							
+			<if test='creationTime != null'>`creation_time` = #{creationTime}  </if>
+
+		</set>
+		where  insurance_record_id = #{insuranceRecordId}
+	</update>
+
+	<!--删除 -->
+	<delete id="delete">
+		DELETE FROM insurance_record
+		 where dr=0 
+		AND insurance_record_id = #{insuranceRecordId}
+	</delete>
+
+	<!--批量删除 -->
+	<delete id="deleteBatch">
+		DELETE FROM insurance_record where dr=0
+		AND insurance_record_id IN
+		<foreach item="id" collection="ids" open="(" separator=","
+			close=")">
+			#{insuranceRecordId}
+		</foreach>
+	</delete>
+
+	<!--修改-->
+	<update id="updateByContract" parameterType="io.renren.entity.InsuranceRecordEntity">
+		update insurance_record s
+		<set>
+			<if test="contractStatus != null">s.`contract_status` = #{contractStatus} </if>
+		</set>
+		<include refid="base_where"/>
+		<if test="contractId != null">
+			and s.`contract_id` = #{contractId}
+		</if>
+	</update>
+	<!-- 批量dr=1 -->
+	<update id="deleteInsuranceRecordByOrderId">
+	update insurance_record  set dr=1 where dr=0 and order_id in 
+		 
+		<foreach item="id" collection="ids" open="(" separator=","
+			close=")">
+			#{orderId}
+		</foreach>
+	</update>
+	<!--批量通过 -->
+	<update id="passAction">
+		update insurance_record  set pass_status = 1,pass_time = #{passTime}
+		where insurance_record_id IN
+		<foreach item="id" collection="ids" open="(" separator=","
+				 close=")">
+			#{id}
+		</foreach>
+	</update>
+	<!--批量未通过 -->
+	<update id="passCancel">
+		update insurance_record  set pass_status = 0
+		where insurance_record_id IN
+		<foreach item="id" collection="ids" open="(" separator=","
+				 close=")">
+			#{id}
+		</foreach>
+	</update>
+	<!--分页总数 -->
+	<select id="checkCount" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			insurance_record
+		WHERE
+			id_number = (
+				SELECT
+					id_number
+				FROM
+					`insurance_record`
+				WHERE
+					insurance_record_id = #{id}
+			)
+		and pass_status = 1
+		and dr = 0
+	</select>
+	<!--保险记录变更日志-->
+	<insert id="saveInsuranceLog" parameterType="io.renren.entity.InsuranceRecordEntity">
+	insert into insurance_record_update_log
+	(
+	`insurance_record_id`,
+	`order_id`,
+	`source_order_id`,
+	`user_id`,
+	`nc_id`,
+	`nc_code`,
+	`nc_user_id`,
+	`nc_commodity_id`,
+	`nc_commodity_name`,
+	`nc_record_name`,
+	`nc_record_code`,
+	`id_type`,
+	`id_number`,
+	`major_code`,
+	`major_name`,
+	`subject_qty`,
+	`tuition_fee`,
+	`premium`,
+	`compensation_amount`,
+	`insurance_status`,
+	`yh_order_code`,
+	`policy_no`,
+	`effect_date`,
+	`expire_date`,
+	`exam_area`,
+	`exam_date`,
+	`product_code`,
+	`project_code`,
+	`project_name`,
+	`insurance_info_id`,
+	`insurance_type`,
+	`dr`,
+	`ts`,
+	`sync_time`,
+	`send_time`,
+	`total_days`,
+	`watch_days`,
+	`template_id`,
+	`signer_id`,
+	`product_id`,
+	`creation_time`,
+	`log_update_time`
+	)
+	values
+	(
+	#{insuranceRecordId},
+	#{orderId},
+	#{sourceOrderId},
+	#{userId},
+	#{ncId},
+	#{ncCode},
+	#{ncUserId},
+	#{ncCommodityId},
+	#{ncCommodityName},
+	#{ncRecordName},
+	#{ncRecordCode},
+	#{idType},
+	#{idNumber},
+	#{majorCode},
+	#{majorName},
+	#{subjectQty},
+	#{tuitionFee},
+	#{premium},
+	#{compensationAmount},
+	#{insuranceStatus},
+	#{yhOrderCode},
+	#{policyNo},
+	#{effectDate},
+	#{expireDate},
+	#{examArea},
+	#{examDate},
+	#{productCode},
+	#{projectCode},
+	#{projectName},
+	#{insuranceInfoId},
+	#{insuranceType},
+	#{dr},
+	#{ts},
+	#{syncTime},
+	#{sendTime},
+	#{totalDays},
+	#{watchDays},
+	#{templateId},
+	#{signerId},
+	#{productId},
+	#{creationTime},
+	#{logUpdateTime}
+
+	)
+	</insert>
+</mapper>

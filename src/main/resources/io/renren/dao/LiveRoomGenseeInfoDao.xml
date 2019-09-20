@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.LiveRoomGenseeInfoDao">
+	<select id="queryList" resultType="io.renren.entity.LiveRoomGenseeInfoEntity">
+		select 
+			* 
+		from 
+			live_room_gensee_info a 
+		where 
+			1 = 1
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	
+	<select id="queryTotal" resultType="int">
+		select 
+			count(1) 
+		from 
+			live_room_gensee_info a 
+		where 
+			1 = 1
+	</select>
+	
+	
+	<select id="queryObjectById" resultType="io.renren.entity.LiveRoomGenseeInfoEntity">
+		select 
+			* 
+		from 
+			live_room_gensee_info a 
+		where a.id = #{id}
+	</select>
+</mapper>

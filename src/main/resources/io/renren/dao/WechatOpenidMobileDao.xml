@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.WechatOpenidMobileDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	wechat_openid_mobile.id AS id , 	wechat_openid_mobile.appid AS appid , 	wechat_openid_mobile.openid AS openid ,
+	wechat_openid_mobile.mobile AS mobile , 	wechat_openid_mobile.wechat_id AS wechatId , 	wechat_openid_mobile.wechat_nickname AS wechatNickname , 	wechat_openid_mobile.user_id AS userId , 	wechat_openid_mobile.create_time AS createTime 	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE 1=1 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM wechat_openid_mobile AS wechat_openid_mobile
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.WechatOpenidMobileEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="io.renren.entity.WechatOpenidMobileEntity">
+		select
+		<include refid="base_column"/>
+        ,(SELECT title FROM `wechat_account` WHERE appid = wechat_openid_mobile.appid) AS  wechatTitle
+        ,users.nick_name as userName
+		<include refid="base_from"/>
+        LEFT JOIN users users ON users.user_id = wechat_openid_mobile.user_id
+		<include refid="base_where"/>
+        <if test="mobile != null and mobile.trim() != ''">
+            AND wechat_openid_mobile.mobile  =#{mobile}
+        </if>
+        <if test="appid != null and appid.trim() != ''">
+            AND wechat_openid_mobile.appid = #{appid}
+        </if>
+        <!-- 未绑定-->
+        <if test="status == 0 ">
+            AND wechat_openid_mobile.appid IS NULL
+        </if>
+        <!-- 已经绑定-->
+        <if test="status == 1 ">
+            AND wechat_openid_mobile.appid  IS  NOT NULL
+        </if>
+        <include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/>
+        LEFT JOIN users users ON users.user_id = wechat_openid_mobile.user_id
+		<include refid="base_where"/>
+        <if test="mobile != null and mobile.trim() != ''">
+            AND wechat_openid_mobile.mobile  =#{mobile}
+        </if>
+        <if test="appid != null and appid.trim() != ''">
+            AND wechat_openid_mobile.appid = #{appid}
+        </if>
+        <!-- 未绑定-->
+        <if test="status == 0 ">
+            AND wechat_openid_mobile.appid is NULL
+        </if>
+        <!-- 已经绑定-->
+        <if test="status == 1 ">
+            AND wechat_openid_mobile.appid  IS  NOT NULL
+        </if>
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="io.renren.entity.WechatOpenidMobileEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into wechat_openid_mobile
+		(
+			`appid`,`openid`,`mobile`,`wechat_id`,`wechat_nickname`,`user_id`,`create_time`)
+		values
+		(
+		    #{appid},#{openid},#{mobile},#{wechatId},#{wechatNickname}, #{userId},#{createTime}
+		)
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.WechatOpenidMobileEntity">
+		update wechat_openid_mobile 
+		<set>
+			<if test="appid != null">`appid` = #{appid}, </if>
+			<if test="openid != null">`openid` = #{openid}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="wechatId != null">`wechat_id` = #{wechatId}, </if>
+			<if test="wechatNickname != null">`wechat_nickname` = #{wechatNickname}, </if>
+			<if test="userId != null">`user_id` = #{userId}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}</if>
+		</set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+	
+	<!--删除-->
+	<delete id="delete">
+		DELETE FROM wechat_openid_mobile 
+		<include refid="base_where"/>
+		AND id = #{id}
+	</delete>
+	
+	<!--批量删除-->
+	<delete id="deleteBatch">
+		DELETE FROM wechat_openid_mobile 
+		<include refid="base_where"/> 
+		AND id IN 
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+    <select id="queryTotalByClassplanId" resultType="int">
+        SELECT
+            COUNT(0)
+        FROM
+            (
+                SELECT
+                    users.user_id AS userId,
+					users.mobile as mobile
+                FROM
+                    course_classplan AS classplan,
+                    course_userplan_class_detail AS userplan_class_detail,
+                    course_userplan_class AS userplan_class,
+                    course_userplan AS userplan,
+                    users as users
+                WHERE
+                    classplan.classplan_id = #{classplanId}
+                AND userplan_class_detail.classplan_id = #{classplanId}
+                AND userplan_class_detail.userplan_class_id = userplan_class.userplan_class_id
+                AND userplan_class.userplan_id = userplan.user_plan_id
+                AND users.user_id = userplan.user_id
+            ) AS temp
+        LEFT JOIN wechat_openid_mobile wechat ON wechat.user_id = temp.userId
+        <include refid="base_where"></include>
+        <if test="appid != null and appid.trim() != ''">
+             AND wechat.appid = #{appid}
+        </if>
+        <!-- 未绑定-->
+        <if test="status == 0 ">
+            AND wechat.appid is NULL
+        </if>
+        <!-- 已经绑定-->
+        <if test="status == 1 ">
+            AND wechat.appid  IS  NOT NULL
+        </if>
+    </select>
+
+    <select id="queryListByClassplanId" resultType="io.renren.entity.WechatOpenidMobileEntity">
+            SELECT
+          temp.userId,temp.mobile,temp.userName,
+          wechat.id,wechat.appid,wechat.openid,
+          wechat.mobile,wechat.wechat_id,
+          wechat.wechat_nickname,
+        (SELECT title FROM `wechat_account` WHERE appid = wechat.appid) AS  wechatTitle,
+          wechat.create_time
+            FROM
+        (
+                SELECT
+                users.user_id AS userId,
+                users.mobile as mobile,
+                users.nick_name as userName
+                FROM
+                course_classplan AS classplan,
+                course_userplan_class_detail AS userplan_class_detail,
+                course_userplan_class AS userplan_class,
+                course_userplan AS userplan,
+                users as users
+                WHERE
+                classplan.classplan_id = #{classplanId}
+                AND userplan_class_detail.classplan_id = #{classplanId}
+                AND userplan_class_detail.userplan_class_id = userplan_class.userplan_class_id
+                AND userplan_class.userplan_id = userplan.user_plan_id
+                AND users.user_id = userplan.user_id
+                ) AS temp
+            LEFT JOIN wechat_openid_mobile wechat ON wechat.user_id = temp.userId
+        <include refid="base_where"></include>
+        <if test="appid != null and appid.trim() != ''">
+             AND wechat.appid = #{appid}
+        </if>
+        <!-- 未绑定-->
+        <if test="status == 0 ">
+            AND wechat.appid is NULL
+        </if>
+        <!-- 已经绑定-->
+        <if test="status == 1 ">
+            AND wechat.appid  IS  NOT NULL
+        </if>
+            ORDER BY temp.userId
+            <if test="offset != null and limit != null">
+                limit #{offset}, #{limit}
+            </if>
+    </select>
+
+    <select id="queryTotalByClassId" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM
+            `mall_order` mall_order
+        LEFT JOIN wechat_openid_mobile wechat ON wechat.user_id = mall_order.user_id
+        LEFT JOIN users users ON users.user_id = mall_order.user_id
+        WHERE
+            mall_order.class_id = #{classId}
+        AND mall_order.dr = 0
+        <if test="appid != null and appid.trim() != ''">
+            AND wechat.appid = #{appid}
+        </if>
+        <!-- 未绑定-->
+        <if test="status == 0 ">
+            AND wechat.appid is NULL
+        </if>
+        <!-- 已经绑定-->
+        <if test="status == 1 ">
+            AND wechat.appid  IS  NOT NULL
+        </if>
+        ORDER BY
+            mall_order.user_id
+    </select>
+
+    <select id="queryListByClassId" resultType="io.renren.entity.WechatOpenidMobileEntity">
+        SELECT
+        mall_order.user_id,users.mobile,users.nick_name AS userName,
+        wechat.id,wechat.appid,wechat.openid,
+        wechat.wechat_id,wechat.wechat_nickName,
+        (SELECT title FROM `wechat_account` WHERE appid = wechat.appid) AS  wechatTitle,
+        wechat.create_time
+        FROM
+            `mall_order` mall_order
+        LEFT JOIN wechat_openid_mobile wechat ON wechat.user_id = mall_order.user_id
+        LEFT JOIN users users ON users.user_id = mall_order.user_id
+        WHERE
+            mall_order.class_id = #{classId}
+        AND mall_order.dr = 0
+        <if test="appid != null and appid.trim() != ''">
+            AND wechat.appid = #{appid}
+        </if>
+        <!-- 未绑定-->
+        <if test="status == 0 ">
+            AND wechat.appid is NULL
+        </if>
+        <!-- 已经绑定-->
+        <if test="status == 1 ">
+            AND wechat.appid  IS  NOT NULL
+        </if>
+        ORDER BY
+            mall_order.user_id
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+
+    <select id="queryListByMobleList" resultType="io.renren.entity.WechatOpenidMobileEntity">
+        SELECT
+            *
+        FROM
+            `wechat_openid_mobile`
+        WHERE appid = #{appid} AND mobile IN
+        <foreach item="mobile" collection="mobileList" open="(" separator="," close=")">
+            #{mobile}
+        </foreach>
+    </select>
+
+    <select id="queryMobileByOpenid" resultType="string">
+        SELECT mobile FROM `wechat_openid_mobile` WHERE openid = #{openid}
+    </select>
+</mapper>

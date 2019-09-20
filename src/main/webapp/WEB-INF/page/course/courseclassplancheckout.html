@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>排课检测</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div>
+		<div class="grid-btn">
+			<table class="table table-condensed" border="0">
+				<tr border="0">
+					<td><label for="name">手机号:</label></td>
+					<td><input type="text" class="form-control" v-model="q.phoneNum" @keyup.enter="query" placeholder="手机号"></td>
+					<td><label for="name">订单号:</label></td>
+					<td><input type="text" class="form-control" v-model="q.orderNo" @keyup.enter="query" placeholder="订单号"></td>
+					<td><label for="name">商品id:</label></td>
+					<td><input type="text" class="form-control" v-model="q.goodId" @keyup.enter="query" placeholder="商品id"></td>
+					<td><label for="name">直播课次名称:</label></td>
+					<td><input type="text" class="form-control" v-model="q.classplanliveName" readonly="readonly" @click="selectClassplanLive" placeholder="点击选择直播课次"></td>
+				</tr>
+			</table>
+		    
+		    <a class="btn  btn-default" @click="rest">重置</a> 
+		    <a class="btn btn-primary" @click="query"><i class='fa fa-search'></i>&nbsp;检测</a>
+		</div>
+		
+	</div>
+	</div>
+<script src="${rc.contextPath}/js/course/courseclassplancheckout.js?_${date.systemTime}"></script>
+#parse("layer/classplanlivesLay.html")
+</body>
+</html>

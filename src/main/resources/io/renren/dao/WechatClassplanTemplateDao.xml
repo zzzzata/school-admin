@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.WechatClassplanTemplateDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	wechat_classplan_template.id AS id , 	wechat_classplan_template.classplan_id AS classplanId , 	wechat_classplan_template.template_id AS templateId , 	wechat_classplan_template.template_name AS templateName ,
+	wechat_classplan_template.template_type AS templateType , 	wechat_classplan_template.appid AS appid , 	wechat_classplan_template.product_id AS productId , 	wechat_classplan_template.dr AS dr , 	wechat_classplan_template.create_time AS createTime ,wechat_classplan_template.update_time AS updateTime , 	wechat_classplan_template.create_user AS createUser 	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE 1=1 AND wechat_classplan_template.dr=0 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM wechat_classplan_template AS wechat_classplan_template
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.WechatClassplanTemplateEntity">
+		select 
+      	<include refid="base_column"/>
+        ,course_classplan.classplan_name,
+        sys_product.product_name,
+        wechat_account.title as wechatTitle
+		<include refid="base_from"/>
+        LEFT JOIN course_classplan course_classplan ON course_classplan.classplan_id = wechat_classplan_template.classplan_id
+        LEFT JOIN sys_product sys_product ON sys_product.product_id = wechat_classplan_template.product_id
+        LEFT JOIN wechat_account wechat_account ON wechat_account.appid = wechat_classplan_template.appid
+		<include refid="base_where"/>
+		AND wechat_classplan_template.id = #{id}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="io.renren.entity.WechatClassplanTemplateEntity">
+		select
+		<include refid="base_column"/>
+        ,course_classplan.classplan_name,
+        sys_product.product_name,
+        sys_user.nick_name as createUserName,
+        sys_user1.nick_name as updateUserName
+		<include refid="base_from"/>
+        LEFT JOIN course_classplan course_classplan ON course_classplan.classplan_id = wechat_classplan_template.classplan_id
+        LEFT JOIN sys_product sys_product ON sys_product.product_id = wechat_classplan_template.product_id
+        LEFT JOIN sys_user sys_user ON sys_user.user_id = wechat_classplan_template.create_user
+        LEFT JOIN sys_user sys_user1 ON sys_user1.user_id = wechat_classplan_template.update_user
+		<include refid="base_where"/>
+        <if test="classplanName != null and classplanName.trim() != ''">
+            AND course_classplan.classplan_name  like concat('%',#{classplanName},'%')
+        </if>
+        <include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/>
+        LEFT JOIN course_classplan course_classplan ON course_classplan.classplan_id = wechat_classplan_template.classplan_id
+        LEFT JOIN sys_product sys_product ON sys_product.product_id = wechat_classplan_template.product_id
+        LEFT JOIN sys_user sys_user ON sys_user.user_id = wechat_classplan_template.create_user
+        LEFT JOIN sys_user sys_user1 ON sys_user1.user_id = wechat_classplan_template.update_user
+		<include refid="base_where"/>
+        <if test="classplanName != null and classplanName.trim() != ''">
+            AND course_classplan.classplan_name  like concat('%',#{classplanName},'%')
+        </if>
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="io.renren.entity.WechatClassplanTemplateEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into wechat_classplan_template
+		(
+			`classplan_id`,`template_id`,`template_name`,`content`,`template_type`,`appid`,`product_id`, `dr`,`create_time`,`create_user`,`update_time`,`update_user`
+		)
+		values
+		(
+			#{classplanId},#{templateId}, #{templateName},#{content}, #{templateType},#{appid},#{productId},0,#{createTime},#{createUser},#{updateTime},#{updateUser}
+		)
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.WechatClassplanTemplateEntity">
+		update wechat_classplan_template 
+		<set>
+			<if test="classplanId != null">`classplan_id` = #{classplanId}, </if>
+			<if test="templateId != null">`template_id` = #{templateId}, </if>
+			<if test="templateName != null">`template_name` = #{templateName}, </if>
+			<if test="templateType != null">`template_type` = #{templateType}, </if>
+			<if test="appid != null">`appid` = #{appid}, </if>
+			<if test="productId != null">`product_id` = #{productId}, </if>
+			<if test="dr != null">`dr` = #{dr}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="createUser != null">`create_user` = #{createUser},</if>
+			<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+			<if test="updateUser != null">`update_user` = #{updateUser}</if>
+		</set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="io.renren.entity.WechatClassplanTemplateEntity">
+		UPDATE wechat_classplan_template 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="io.renren.entity.WechatClassplanTemplateEntity">
+		UPDATE wechat_classplan_template 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id IN 
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+
+    <select id="isExistByClassplanId" resultType="int">
+        SELECT
+            COUNT(1)
+        FROM
+            `wechat_classplan_template`
+       <include refid="base_where"/>
+        AND   classplan_id = #{classplanId}
+        AND appid = #{appid}
+        AND template_id = #{templateId}
+        <if test="type == 1">
+            AND id=#{id}
+        </if>
+    </select>
+</mapper>

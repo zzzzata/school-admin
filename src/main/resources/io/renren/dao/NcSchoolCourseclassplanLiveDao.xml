@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.NcSchoolCourseclassplanLiveDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	nc_school_courseclassplan_live.id AS id , 	nc_school_courseclassplan_live.courseclassplan_live_id AS courseclassplanLiveId , 	nc_school_courseclassplan_live.courseclassplan_live_name AS courseclassplanLiveName , 	nc_school_courseclassplan_live.courseclassplan_id AS courseclassplanId , 	nc_school_courseclassplan_live.start_time AS startTime , 	nc_school_courseclassplan_live.end_time AS endTime , 	nc_school_courseclassplan_live.schedule_time AS scheduleTime , 	nc_school_courseclassplan_live.course_teacher_id AS courseTeacherId , 	nc_school_courseclassplan_live.course_teacher_name AS courseTeacherName , 	nc_school_courseclassplan_live.file_name AS fileName , 	nc_school_courseclassplan_live.file_url AS fileUrl , 	nc_school_courseclassplan_live.review_name AS reviewName , 	nc_school_courseclassplan_live.review_url AS reviewUrl , 	nc_school_courseclassplan_live.prepare_name AS prepareName , 	nc_school_courseclassplan_live.prepare_url AS prepareUrl , 	nc_school_courseclassplan_live.courseware_name AS coursewareName , 	nc_school_courseclassplan_live.courseware_url AS coursewareUrl , 	nc_school_courseclassplan_live.phase_id AS phaseId , 	nc_school_courseclassplan_live.phase_name AS phaseName , 	nc_school_courseclassplan_live.create_time AS createTime , 	nc_school_courseclassplan_live.modified_time AS modifiedTime , 	nc_school_courseclassplan_live.dr AS dr , 	nc_school_courseclassplan_live.nc_modified_time AS ncModifiedTime 	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE 1 = 1 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM nc_school_courseclassplan_live AS nc_school_courseclassplan_live
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.NcSchoolCourseclassplanLiveEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="io.renren.entity.NcSchoolCourseclassplanLiveEntity">
+		select
+		<include refid="base_column"/>
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+		<include refid="base_order"/>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="io.renren.entity.NcSchoolCourseclassplanLiveEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into nc_school_courseclassplan_live
+		(
+		`courseclassplan_live_id`,`courseclassplan_live_name`,`courseclassplan_id`,`start_time`,`end_time`,`schedule_time`,`course_teacher_usercode`,`course_teacher_id`,`course_teacher_name`,`file_name`,`file_url`,`review_name`,`review_url`,`prepare_name`,`prepare_url`,`courseware_name`,`courseware_url`,`phase_id`,`phase_name`,`create_time`,`modified_time`,`dr`,`nc_modified_time`,`classplan_live_fk`
+		)
+		values
+		(
+		#{courseclassplanLiveId},#{courseclassplanLiveName},#{courseclassplanId},#{startTime},#{endTime},#{scheduleTime},#{courseTeacherUsercode},#{courseTeacherId},#{courseTeacherName},#{fileName},#{fileUrl},#{reviewName},#{reviewUrl},#{prepareName},#{prepareUrl},#{coursewareName},#{coursewareUrl}, #{phaseId},#{phaseName},#{createTime}, #{modifiedTime},#{dr},#{ncModifiedTime},#{classplanLiveFk}
+		)
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.NcSchoolCourseclassplanLiveEntity">
+		update nc_school_courseclassplan_live 
+		<set>
+			<if test="courseclassplanLiveId != null">`courseclassplan_live_id` = #{courseclassplanLiveId}, </if>
+			<if test="courseclassplanLiveName != null">`courseclassplan_live_name` = #{courseclassplanLiveName}, </if>
+			<if test="courseclassplanId != null">`courseclassplan_id` = #{courseclassplanId}, </if>
+			<if test="startTime != null">`start_time` = #{startTime}, </if>
+			<if test="endTime != null">`end_time` = #{endTime}, </if>
+			<if test="scheduleTime != null">`schedule_time` = #{scheduleTime}, </if>
+			<if test="courseTeacherUsercode != null">`course_teacher_usercode` = #{courseTeacherUsercode}, </if>
+			<if test="courseTeacherId != null">`course_teacher_id` = #{courseTeacherId}, </if>
+			<if test="courseTeacherName != null">`course_teacher_name` = #{courseTeacherName}, </if>
+			<if test="fileName != null">`file_name` = #{fileName}, </if>
+			<if test="fileUrl != null">`file_url` = #{fileUrl}, </if>
+			<if test="reviewName != null">`review_name` = #{reviewName}, </if>
+			<if test="reviewUrl != null">`review_url` = #{reviewUrl}, </if>
+			<if test="prepareName != null">`prepare_name` = #{prepareName}, </if>
+			<if test="prepareUrl != null">`prepare_url` = #{prepareUrl}, </if>
+			<if test="coursewareName != null">`courseware_name` = #{coursewareName}, </if>
+			<if test="coursewareUrl != null">`courseware_url` = #{coursewareUrl}, </if>
+			<if test="phaseId != null">`phase_id` = #{phaseId}, </if>
+			<if test="phaseName != null">`phase_name` = #{phaseName}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="modifiedTime != null">`modified_time` = #{modifiedTime}, </if>
+			<if test="dr != null">`dr` = #{dr}, </if>
+			<if test="classplanLiveFk != null">`classplan_live_fk` = #{classplanLiveFk}, </if>
+			<if test="ncModifiedTime != null">`nc_modified_time` = #{ncModifiedTime}</if>
+		</set>
+		<include refid="base_where"/>
+		AND courseclassplan_live_id = #{courseclassplanLiveId}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="io.renren.entity.NcSchoolCourseclassplanLiveEntity">
+		UPDATE nc_school_courseclassplan_live 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="io.renren.entity.NcSchoolCourseclassplanLiveEntity">
+		UPDATE nc_school_courseclassplan_live 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id IN 
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+
+    <update id="updateByClassplanId" parameterType="map">
+        UPDATE `nc_school_courseclassplan_live`
+        SET dr = #{dr},
+         modified_time = #{modifiedTime}
+        WHERE
+            courseclassplan_id = #{courseclassplanId}
+    </update>
+
+    <select id="isExistByClassplanLiveId" resultType="int">
+        SELECT
+        COUNT(1)
+        FROM
+        `nc_school_courseclassplan_live`
+        WHERE
+        courseclassplan_live_id = #{courseclassplanLiveId}
+        <if test="ncModifiedTime != null">
+            AND nc_modified_time &lt; #{ncModifiedTime}
+        </if>
+    </select>
+</mapper>

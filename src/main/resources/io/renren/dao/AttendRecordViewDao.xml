@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.AttendRecordViewDao">
+    <!-- 查询学员的录播考勤 -->
+    <select id="queryListPOJO" resultType="io.renren.pojo.AttendRecordViewPOJO">
+        SELECT
+        users.user_id AS userId,
+        users.nick_name AS userName,
+        users.mobile AS mobile,
+        mallClassType.classtype_name AS classtypeName,
+        courses.course_name AS courseName,
+        recordDetail.polyv_name AS videoName ,
+        mallClass.class_name AS className,
+        sysUser.nick_name AS teacherName,
+        watch.attent_per AS recordPerTxt,
+        recordDetail.record_id AS recordId
+        FROM
+        mall_order AS mallOrder
+        JOIN users AS users ON users.user_id = mallOrder.user_id
+        JOIN mall_class AS mallClass ON mallClass.class_id = mallOrder.class_id
+        JOIN mall_class_type AS mallClassType ON mallClassType.classtype_id = mallOrder.class_type_id
+        JOIN sys_user AS sysUser ON sysUser.user_id = mallClass.user_id
+        JOIN log_polyv_watch AS watch ON watch.user_id = mallOrder.user_id
+        JOIN courses AS courses ON watch.course_id = courses.course_id
+        JOIN course_record_detail AS recordDetail ON recordDetail.record_id = watch.record_id
+        WHERE mallOrder.dr = 0
+        AND courses.dr = 0
+        AND mallClassType.dr = 0
+        AND users.dr = 0
+        AND mallClass.dr = 0
+        <if test="startDate != null ">AND watch.create_time &gt;= #{startDate}</if>
+        <if test="endDate != null ">AND watch.create_time &lt;= #{endDate}</if>
+        <if test="classtypeId != null and classtypeId != '' ">AND mallClassType.classtype_id= #{classtypeId}</if>
+        <if test="courseId != null and courseId != '' ">AND courses.course_id= #{courseId}</if>
+        <if test="deptId != null and deptId != '' ">AND mallOrder.dept_id= #{deptId}</if>
+        <if test="videoName != null and videoName != '' ">AND recordDetail.polyv_name LIKE
+            concat('%',#{videoName},'%')
+        </if>
+        <if test="className != null and className != '' ">AND mallClass.class_name LIKE
+            concat('%',#{className},'%')
+        </if>
+        <if test="teacherName != null and teacherName != '' ">AND sysUser.nick_name LIKE
+            concat('%',#{teacherName},'%')
+        </if>
+        <if test="userName != null and userName != '' ">AND users.nick_name LIKE concat('%',#{userName},'%')
+        </if>
+        <if test="mobile != null and mobile != '' ">AND users.mobile LIKE concat('%',#{mobile},'%')
+        </if>
+    </select>
+
+
+  <!--  &lt;!&ndash;分页总数&ndash;&gt;
+    <select id="queryTotal" resultType="int">
+        SELECT
+        count(*)
+        FROM
+        mall_order AS mallOrder
+        JOIN users AS users ON users.user_id = mall_order.user_id
+        JOIN mall_class AS mallClass ON mall_class.class_id = mall_order.class_id
+        JOIN mall_class_type AS mallClassType ON mall_class_type.classtype_id = mall_order.class_type_id
+        JOIN sys_user AS sysUser ON sys_user.user_id = mall_class.user_id
+        JOIN log_polyv_watch AS watch ON watch.user_id = mall_order.user_id
+        JOIN courses AS courses ON watch.course_id = courses.course_id
+        JOIN course_record_detail AS recordDetail ON recordDetail.record_id = watch.record_id
+        WHERE mall_order.dr = 0,
+        AND courses.dr = 0,
+        AND mallClassType.dr = 0,
+        AND users.dr = 0,
+        AND mall_class.dr = 0,
+        <if test="if startTime != null and startTime != '' ">AND watch.create_time &gt;= #{startTime},</if>
+        <if test="if endTime != null and endTime != '' ">AND watch.create_time &lt;= #{endTime},</if>
+        <if test="if classtypeId != null and classtypeId != '' ">AND mallClassType.classtype_id= #{classtypeId},</if>
+        <if test="if courseId != null and courseId != '' ">AND courses.course_id= #{courseId},</if>
+        <if test="if deptId != null and deptId != '' ">AND mallOrder.dept_id= #{deptId},</if>
+        <if test="if polyvName != null and polyvName != '' ">AND recordDetail.polyv_name= LIKE
+            concat('%',#{polyvName},'%'),
+        </if>
+        <if test="if className != null and className != '' ">AND mall_class.class_name LIKE
+            concat('%',#{className},'%'),
+        </if>
+        <if test="if teacherName != null and teacherName != '' ">AND sys_user.nick_name LIKE
+            concat('%',#{teacherName},'%'),
+        </if>
+        <if test="if nickName != null and nickName != '' ">AND users.nick_name LIKE concat('%',#{nickName},'%'),
+        </if>
+        <if test="if mobile != null and mobile != '' ">AND users.mobile LIKE concat('%',#{mobile},'%')
+        </if>
+    </select>-->
+    
+    <select id="queryLogPolyvDetailsByUserIdAndRecordId" resultType="io.renren.pojo.RecordLogDetailsPOJO">
+    	select 
+    		lpd.user_id as userId,
+    		users.nick_name as userName,
+    		users.mobile as mobile,
+    		crd.name as recordName,
+    		crd.polyv_name as videoName,
+    		lpd.play_duration as playDuration
+    	from
+    		log_polyv_detail as lpd
+    		left join course_record_detail crd on crd.record_id = lpd.record_id
+    		left join users users on users.user_id = lpd.user_id
+    	where
+    		lpd.user_id = #{userId} 
+    		and lpd.record_id = #{recordId}
+    </select>
+    
+    <select id="queryRecordCourseCallbackDetailByUserIdAndRecordId" resultType="io.renren.pojo.RecordLogDetailsPOJO">
+    	select 
+    		rccd.user_id as userId,
+    		users.nick_name as userName,
+    		users.mobile as mobile,
+    		crd.name as recordName,
+    		crd.polyv_name as videoName,
+    		(rccd.leave_time - rccd.join_time) as playDuration
+    	from
+    		record_course_callback_detail as rccd
+    		left join course_record_detail crd on crd.record_id = rccd.record_id
+    		left join users users on users.user_id = rccd.user_id
+    	where
+    		rccd.user_id = #{userId} 
+    		and rccd.record_id = #{recordId}
+    </select>
+</mapper>

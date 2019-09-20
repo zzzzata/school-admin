@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.renren.dao.courseliverelaterecord.CourseLiveRelateRecordDao">
+
+    <sql id="base_column">
+        relate.id as id,
+        relate.course_id as courseId,
+        relate.live_id as liveId,
+        relate.record_id as recordId,
+        relate.state as state,
+        relate.create_user_id as createUserId,
+        relate.create_time as createTime
+    </sql>
+
+    <!-- 查询直播课次与录播关联关系，根据直播分组 -->
+    <select id="queryCourseLiveRelateRecordGroupByLive" resultType="io.renren.pojo.courseliverelaterecord.CourseLiveRelateRecordPOJO">
+        SELECT
+        relate.id as id,
+        relate.course_id as courseId,
+        relate.live_id as liveId,
+        relate.state as state,
+        relate.create_user_id as createUserId,
+        relate.create_time as createTime,
+        GROUP_CONCAT(relate.`record_id`) AS recordIds,
+        courses.course_name AS courseName,l.classplan_live_name as liveName, GROUP_CONCAT(r.`name`) AS recordNameGroup
+        FROM
+        course_live_relate_record relate,
+        courses courses,
+        course_classplan_lives l,
+        course_record_detail r
+        WHERE
+        courses.course_id = relate.course_id
+        AND l.classplan_live_id = relate.live_id
+        AND r.record_id = relate.record_id
+        <if test="dr != null">
+            AND relate.dr = #{dr}
+        </if>
+        <if test="courseId != null">
+            AND relate.course_id = #{courseId}
+        </if>
+        <if test="liveName != null and liveName.trim() != ''">
+            AND l.classplan_live_name LIKE concat('%',#{liveName},'%')
+        </if>
+        <if test="recordName != null and recordName.trim() != ''">
+            AND r.name LIKE concat('%',#{recordName},'%')
+        </if>
+        <if test="liveId != null and liveId.trim() != ''">
+            AND relate.live_id = #{liveId}
+        </if>
+        <if test="recordId != null">
+            AND relate.record_id = #{recordId}
+        </if>
+        <if test="state != null">
+            AND relate.state = #{state}
+        </if>
+        GROUP BY relate.live_id
+        ORDER BY MAX(relate.`create_time`) DESC
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
+    <!-- 分页查询直播课次与录播关联关系 -->
+    <select id="queryCourseLiveRelateRecordList" resultType="io.renren.pojo.courseliverelaterecord.CourseLiveRelateRecordPOJO">
+        SELECT
+            <include refid="base_column"/>,courses.course_name AS courseName,l.classplan_live_name as liveName,r.name as recordName
+        FROM
+            course_live_relate_record relate,
+            courses courses,
+            course_classplan_lives l,
+            course_record_detail r
+        WHERE
+            courses.course_id = relate.course_id
+            AND l.classplan_live_id = relate.live_id
+            AND r.record_id = relate.record_id
+            <if test="dr != null">
+                AND relate.dr = #{dr}
+            </if>
+            <if test="courseId != null">
+                AND relate.course_id = #{courseId}
+            </if>
+            <if test="liveName != null and liveName.trim() != ''">
+                AND l.classplan_live_name LIKE concat('%',#{liveName},'%')
+            </if>
+            <if test="recordName != null and recordName.trim() != ''">
+                AND r.name LIKE concat('%',#{recordName},'%')
+            </if>
+            <if test="liveId != null and liveId.trim() != ''">
+                AND relate.live_id = #{liveId}
+            </if>
+            <if test="recordId != null">
+                AND relate.record_id = #{recordId}
+            </if>
+            <if test="state != null">
+                AND relate.state = #{state}
+            </if>
+        ORDER BY relate.`create_time` DESC
+        <if test="offset != null and limit != null">
+            LIMIT #{offset}, #{limit}
+        </if>
+    </select>
+
+    <!-- 直播课次与录播关联关系数据总量 -->
+    <select id="courseLiveRelateRecordListTotal" resultType="int">
+        SELECT
+            count(DISTINCT relate.live_id)
+        FROM
+            course_live_relate_record relate,
+            courses courses,
+            course_classplan_lives l,
+            course_record_detail r
+        WHERE
+            courses.course_id = relate.course_id
+            AND l.classplan_live_id = relate.live_id
+            AND r.record_id = relate.record_id
+            AND relate.dr = 0
+            <if test="courseId != null">
+                AND relate.course_id = #{courseId}
+            </if>
+            <if test="liveName != null and liveName.trim() != ''">
+                AND l.classplan_live_name LIKE concat('%',#{liveName},'%')
+            </if>
+            <if test="recordName != null and recordName.trim() != ''">
+                AND r.name LIKE concat('%',#{recordName},'%')
+            </if>
+            <if test="state != null">
+                AND relate.state = #{state}
+            </if>
+    </select>
+
+    <!--更新-->
+    <update id="updateBySql" parameterType="io.renren.entity.courseliverelaterecord.CourseLiveRelateRecordEntity">
+        UPDATE `course_live_relate_record`
+        <set>
+            <if test="params.dr!=null"> dr = #{params.dr},</if>
+            <if test="params.state!=null"> state = #{params.state}</if>
+        </set>
+        WHERE ${whereSql}
+    </update>
+
+    <!--新增-->
+    <insert id="save" parameterType="io.renren.entity.courseliverelaterecord.CourseLiveRelateRecordEntity">
+    insert into `course_live_relate_record` (course_id, live_id,record_id,state,create_user_id,create_time)
+    values (#{courseId,jdbcType=BIGINT}, #{liveId,jdbcType=VARCHAR},#{recordId,jdbcType=BIGINT},
+      #{state,jdbcType=TINYINT}, #{createUserId,jdbcType=BIGINT}, #{createTime,jdbcType=DATE})
+    </insert>
+
+</mapper>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.ReturnVisitConfigDao">
+
+
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	return_visit_config.id AS id , return_visit_config.product_id AS productId , sys_product.product_name AS productName, return_visit_config.return_num AS returnNum , sys_user.username AS updatePersonName , return_visit_config.update_time AS updateTime </sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE return_visit_config.dr=0 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM return_visit_config AS return_visit_config LEFT JOIN sys_product AS sys_product ON return_visit_config.product_id=sys_product.product_id LEFT	JOIN sys_user ON sys_user.user_id=return_visit_config.update_person
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY id DESC
+	</sql>
+
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.ReturnVisitConfigEntity">
+		select
+		<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</select>
+
+	<!--分页列表-->
+	<select id="queryList" resultType="io.renren.entity.ReturnVisitConfigEntity">
+		select
+		<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		ORDER BY productName DESC
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+
+	<!--分页总数-->
+	<select id="queryTotal" resultType="int">
+		select count(1)
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+	</select>
+
+
+    <select id="queryListBySign" resultType="io.renren.entity.ReturnVisitConfigEntity">
+		SELECT
+			return_visit_config.*
+		FROM
+			return_visit_config
+		LEFT JOIN mall_order ON mall_order.product_id = return_visit_config.product_id
+		LEFT JOIN record_sign ON record_sign.order_id = mall_order.order_id
+		WHERE
+			record_sign.record_sign_id =#{recordSignId}
+			and return_visit_config.dr = 0 ORDER BY return_visit_config.return_num ASC
+    </select>
+    <!--新增-->
+	<insert id="save" parameterType="io.renren.entity.ReturnVisitConfigEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into return_visit_config
+		(
+				`product_id`, 				`return_num`, 				`dr`, 				`create_time`, 				`update_person`, 				`update_time`		)
+		values
+		(
+															#{productId}, 																			#{returnNum}, 																			0, 																			#{createTime}, 																			#{updatePerson}, 																			#{updateTime}									)
+	</insert>
+
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.ReturnVisitConfigEntity">
+		update return_visit_config
+		<set>
+			<if test="productId != null">`product_id` = #{productId}, </if>
+			<if test="returnNum != null">`return_num` = #{returnNum}, </if>
+			<if test="dr != null">`dr` = #{dr}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="updatePerson != null">`update_person` = #{updatePerson}, </if>
+			<if test="updateTime != null">`update_time` = #{updateTime}</if>
+		</set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+
+	<!--删除-->
+	<update id="delete" parameterType="io.renren.entity.ReturnVisitConfigEntity">
+		UPDATE return_visit_config
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="io.renren.entity.ReturnVisitConfigEntity">
+		UPDATE return_visit_config
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id IN
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+</mapper>

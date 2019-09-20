@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.HangjiaOrderSyncDao">
+    <insert id="addOrder" parameterType="io.renren.entity.MallOrderEntity" useGeneratedKeys="true"
+            keyProperty="orderId">
+		insert into mall_order
+		(
+		    `order_id`,
+			`order_no`,
+			`order_name`,
+			`user_id`,
+			`commodity_id`,
+			`commodity_name`,
+			`total_money`,
+			`pay_money`,
+			`pay_status`,
+			`pic`,
+			`spic`,
+			`dr`,
+			`pay_type`,
+			`creation_time`,
+			`modified_time`,
+			`source_type`,
+			`nc_id`,
+			`level_id`,
+			`profession_id`,
+			`status`,
+			`syn_time`,
+			`product_id`,
+			`date_validity`,
+			`refund_status`,
+			`is_free`,
+			`area_id`,
+			`permannent`
+		)
+		values
+		(
+		    #{orderId},
+			#{orderNo},
+			#{orderName},
+			#{userId},
+			#{commodityId},
+			#{commodityName},
+			#{totalMoney},
+			#{payMoney},
+			#{payStatus},
+			#{pic},
+			#{spic},
+			#{dr},
+			#{payType},
+			#{creationTime},
+			#{modifiedTime},
+			#{sourceType},
+			#{ncId},
+			#{levelId},
+			#{professionId},
+			#{status},
+			#{synTime},
+			#{productId},
+			#{dateValidity},
+			#{refundStatus},
+			#{isFree},
+			#{areaId},
+			#{permannent}
+		)
+	</insert>
+
+
+    <!--修改-->
+    <update id="updateOrder" parameterType="io.renren.entity.MallOrderEntity">
+        update mall_order
+        <set>
+            <if test="orderId != null">`order_id` = #{orderId},</if>
+            <if test="orderNo != null">`order_no` = #{orderNo},</if>
+            <if test="orderName != null">`order_name` = #{orderName},</if>
+            <if test="userId != null">`user_id` = #{userId},</if>
+            <if test="commodityId != null">`commodity_id` = #{commodityId},</if>
+            <if test="commodityName != null">`commodity_name` = #{commodityName},</if>
+            <if test="totalMoney != null">`total_money` = #{totalMoney},</if>
+            <if test="payMoney != null">`pay_money` = #{payMoney},</if>
+            <if test="payStatus != null">`pay_status` = #{payStatus},</if>
+            <if test="pic != null">`pic` = #{pic},</if>
+            <if test="dr != null">`dr` = #{dr},</if>
+            <if test="payType != null">`pay_type` = #{payType},</if>
+            <if test="creationTime != null">`creation_time` = #{creationTime},</if>
+            <if test="modifiedTime != null">`modified_time` = #{modifiedTime},</if>
+            <if test="sourceType != null">`source_type` = #{sourceType},</if>
+            <if test="ncId != null">`nc_id` = #{ncId},</if>
+            <if test="levelId != null">`level_id` = #{levelId},</if>
+            <if test="status != null">`status` = #{status},</if>
+            <if test="synTime != null">`syn_time` = #{synTime},</if>
+            <if test="productId != null">`product_id` = #{productId},</if>
+            <if test="dateValidity != null">`date_validity` = #{dateValidity},</if>
+            <if test="refundStatus != null">`refund_status` = #{refund_status},</if>
+            <if test="isFree != null">`is_free` = #{isFree}</if>
+            <if test="permannent != null">`permannent` = #{permannent}</if>
+        </set>
+        where nc_id = #{ncId}
+    </update>
+    <!-- 更新订单的 -->
+    <update id="updateOrderRefundsStatus" parameterType="io.renren.entity.MallOrderEntity">
+        update mall_order
+        <set>
+            <if test="refundStatus != null">
+                `refund_status` = #{refundStatus}
+            </if>
+        </set>
+        where nc_id=#{ncId}
+    </update>
+    <!-- 插入订单的时候查询 -->
+    <select id="getMallOrder" resultType="io.renren.entity.MallOrderEntity">
+        SELECT * FROM mall_order
+        WHERE dr = 0
+        <if test="userId != null">AND user_id = #{userId}</if>
+        <if test="commodityId != null">AND commodity_id = #{commodityId}</if>
+        <if test="date != null">AND date_validity >= #{date}</if>
+        AND refund_status not in(1,2) limit 1
+    </select>
+   <!-- 更新订单信息的时候查询 -->
+	<select id="selectMallOrder" resultType="io.renren.entity.MallOrderEntity">
+		SELECT * FROM mall_order
+		WHERE dr = 0
+		<if test="userId != null">AND user_id = #{userId}</if>
+		<if test="commodityId != null">AND commodity_id = #{commodityId}</if>
+		<if test="orderCode != null">AND nc_id = #{orderCode}</if>
+	    limit 1
+	</select>
+
+    <select id="getOrderId" resultType="Long">
+        SELECT order_id FROM mall_order
+        WHERE 1=1
+        <if test="orderCode != null">AND nc_id = #{orderCode}</if>
+    </select>
+
+</mapper>

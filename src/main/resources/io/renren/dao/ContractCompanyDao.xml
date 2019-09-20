@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.ContractCompanyDao">
+    <insert id="insertCompany" >
+        insert into dept_contract_config (`ncid`,`dept_name`,`company_id`,`company_name`) values (#{ncid},#{deptName},#{companyId},#{companyName});
+    </insert>
+
+    <select id="queryCountCompanyByNcid" resultType="Integer">
+        select count(*) from dept_contract_config where ncid=#{ncid};
+    </select>
+
+    <insert id="insertBatch" parameterType="java.util.List">
+        insert into dept_contract_config (`ncid`,`dept_name`,`company_id`,`company_name`) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.ncid,jdbcType=INTEGER}, #{item.deptName,jdbcType=BIGINT}, #{item.companyId,jdbcType=INTEGER},
+            #{item.companyName,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+
+</mapper>

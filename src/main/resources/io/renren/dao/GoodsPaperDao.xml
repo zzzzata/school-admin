@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.GoodsPaperDao">
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+		goods_paper.id AS id , 	
+		goods_paper.good_id AS goodId , 	
+		goods_paper.paper_id AS paperId , 	
+		goods_paper.paper_name AS paperName , 	
+		goods_paper.created_time AS createdTime , 	
+		goods_paper.updated_time AS updatedTime , 	
+		goods_paper.creator AS creator , 	
+		goods_paper.updater AS updater , 	
+		goods_paper.dr AS dr ,
+		mall_goods_info.name AS goodName	
+	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE goods_paper.dr = 0
+    	<if test="goodName != null">
+    		AND mall_goods_info.name like concat('%',#{goodName},'%')
+    	</if>
+    	<if test="paperName != null">
+    		AND goods_paper.paper_name like concat('%',#{paperName},'%')
+    	</if> 	
+    </sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM goods_paper AS goods_paper
+    	 LEFT JOIN mall_goods_info AS mall_goods_info ON mall_goods_info.id = goods_paper.good_id
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY goods_paper.id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.GoodsPaperEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND goods_paper.id = #{id}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="io.renren.entity.GoodsPaperEntity">
+		select
+		<include refid="base_column"/>
+		,
+		(select sys_user.nick_name from sys_user sys_user where sys_user.user_id = goods_paper.creator) AS creatorName,
+		(select sys_user.nick_name from sys_user sys_user where sys_user.user_id = goods_paper.updater) AS updaterName
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+		<include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+	</select>
+	<select id="getCountByGoodIdAndPaperId" resultType="int">
+		select count(1) from goods_paper where good_id = #{goodId} and paper_id = #{paperId} and dr = 0
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="io.renren.entity.GoodsPaperEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into goods_paper
+		(
+			`good_id`, 				
+			`paper_id`, 				
+			`paper_name`, 				
+			`created_time`, 				
+			`updated_time`, 				
+			`creator`, 				
+			`updater`, 				
+			`dr`		
+		)
+		values
+		(
+			#{goodId}, 																			
+			#{paperId}, 																			
+			#{paperName}, 																			
+			#{createdTime}, 																			
+			#{updatedTime}, 																			
+			#{creator}, 																			
+			#{updater}, 																			
+			0									
+		)
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.GoodsPaperEntity">
+		update goods_paper 
+		<set>
+			<if test="goodId != null">`good_id` = #{goodId}, </if>
+			<if test="paperId != null">`paper_id` = #{paperId}, </if>
+			<if test="paperName != null">`paper_name` = #{paperName}, </if>
+			<if test="createdTime != null">`created_time` = #{createdTime}, </if>
+			<if test="updatedTime != null">`updated_time` = #{updatedTime}, </if>
+			<if test="creator != null">`creator` = #{creator}, </if>
+			<if test="updater != null">`updater` = #{updater}, </if>
+			<if test="dr != null">`dr` = #{dr}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="io.renren.entity.GoodsPaperEntity">
+		UPDATE goods_paper 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="io.renren.entity.GoodsPaperEntity">
+		UPDATE goods_paper 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id IN 
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+</mapper>

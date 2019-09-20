@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head>
+    <title>按科目统计学员</title>
+    #parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+    <!--<div v-show="showList">-->
+    <!--<div class="grid-btn">-->
+    <!--#if($shiro.hasPermission("courseabnormalorder:list"))-->
+    <!--<table  class="table table-condensed" border="0">-->
+    <!--<tr border="0">-->
+    <!--<td><label for="name">选择课程</label></td>-->
+    <!--<td>-->
+    <!--<input type="text" class="form-control" id="query-courseName" v-model="qCourseAbnormalOrder.courseName" readonly="readonly" placeholder="选择课程" @click="selectCourse">-->
+    <!--</td>-->
+    <!--<td><label for="name">选择排课:</label></td>-->
+    <!--<td><input type="text" class="form-control" id="query-coursePlan"  v-model="qCourseAbnormalOrder.coursePlan" readonly="readonly" placeholder="选择班排课" @click="coursePlanShow"></td>-->
+
+    <!--&lt;!&ndash; 班班级 &ndash;&gt;-->
+    <!--<td><label for="name">班级:</label></td>-->
+    <!--<td><input type="text" class="form-control" id="query-className"  v-model="qCourseAbnormalOrder.className" readonly="readonly" placeholder="点击选择班级" @click="classLayerShow"></td>-->
+
+
+    <!--<td><label for="name">班主任:</label></td>-->
+    <!--<td><input type="text" class="form-control" id="query-headTeacherName"  v-model="qCourseAbnormalOrder.headTeacherName" readonly="readonly" placeholder="点击选择班主任" @click="headTeacherShow"></td>-->
+
+
+    <!--&lt;!&ndash;<td><label for="name">选择学员状态</label></td>&ndash;&gt;-->
+    <!--<td>-->
+    <!--<select id="studentStatus" class="form-control" >-->
+    <!--<option value="-1" id="selectFirst">选择考核状态</option>-->
+    <!--<option value="0" >全部</option>-->
+    <!--<option value="1" >报考学员</option>-->
+    <!--<option value="2">免考核学员</option>-->
+    <!--</select>-->
+    <!--</td>-->
+    <!--<td>-->
+    <!--<input type="text"  id="nickName"  @keyup.enter="query" placeholder="学员姓名">-->
+    <!--<input type="text"  id="mobile"   @keyup.enter="query" placeholder="学员号码">-->
+    <!--</td>-->
+
+
+    <!--</tr>-->
+
+    <!--<tr border="0">-->
+    <!--<td><label for="name">日期:</label></td>-->
+    <!--<td nowrap="nowrap" colspan=2>-->
+    <!--<input type="text" class="insertTime" id="qStartTime" readonly="readonly" v-model="qCourseAbnormalOrder.startTime" @keyup.enter="query" placeholder="开始日期">-->
+    <!--<input type="text" class="insertTime" id="qEndTime" readonly="readonly" v-model="qCourseAbnormalOrder.endTime" @keyup.enter="query" placeholder="结束日期">-->
+    <!--</td>-->
+    <!--<td><label for="name">总出勤率:</label></td>-->
+    <!--<td nowrap="nowrap" colspan=2>-->
+    <!--<input type="text"  id="attendRateStart"  v-model="qCourseAbnormalOrder.attendRateStart" @keyup.enter="query" placeholder="总出勤率最小值">-->
+    <!--<input type="text"  id="attendRateEnd"  v-model="qCourseAbnormalOrder.attendRateStart" @keyup.enter="query" placeholder="总出勤率最大值">-->
+    <!--</td>-->
+
+    <!--<td><label for="name">作业达标率:</label></td>-->
+    <!--<td nowrap="nowrap" colspan=2>-->
+    <!--<input type="text"  id="passRateStart"  v-model="qCourseAbnormalOrder.passRateStart" @keyup.enter="query" placeholder="达标率最小值">-->
+    <!--<input type="text"  id="passRateEnd"  v-model="qCourseAbnormalOrder.passRateStart" @keyup.enter="query" placeholder="达标率最大值">-->
+    <!--</td>-->
+
+    <!--<a class="btn btn-default" @click="clearQcousrAbnormalOrder">重置</a>-->
+    <!--<a class="btn btn-primary" id="getStatisticExcel" onclick="getStatisticExcel()"><i class='fa fa-search'></i>&nbsp;查询</a>-->
+
+    <!--</tr>-->
+    <!--</table>-->
+
+    <!--#end-->
+    <!--#if($shiro.hasPermission("courseabnormalorder:save"))-->
+    <!--<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>-->
+    <!--#end-->
+    <!--#if($shiro.hasPermission("courseabnormalorder:update"))-->
+    <!--<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>-->
+    <!--#end-->
+    <!--#if($shiro.hasPermission("courseabnormalorder:updateCancel"))-->
+    <!--<a class="btn btn-primary" @click="del"><i class="fa fa-trash-o"></i>&nbsp;作废</a>-->
+    <!--#end-->
+    <!--#if($shiro.hasPermission("courseabnormalorder:auditPass"))-->
+    <!--<a class="btn btn-primary" @click="auditPass"><i class="fa fa-pencil-square-o"></i>&nbsp;审核</a>-->
+    <!--#end-->
+    <!--#if($shiro.hasPermission("courseabnormalorder:updateAuditCancel"))-->
+    <!--<a class="btn btn-primary" @click="auditCancel"><i class="fa fa-pencil-square-o"></i>&nbsp;反审核</a>-->
+    <!--#end-->
+    <!--#if($shiro.hasPermission("courseabnormalorder:importExcel"))-->
+    <!--<a class="btn btn-primary" @click="importExcel"><i class="fa fa-recycle"></i>&nbsp;批量导入</a>-->
+    <!--#end-->
+    <!--#if($shiro.hasPermission("courseabnormalorder:downExcelTemplate"))-->
+    <!--<a class="btn btn-primary" @click="downExcelTemplate"><i class="fa fa-pencil-square-o"></i>&nbsp;模板下载</a>-->
+    <!--#end-->
+    <!--#if($shiro.hasPermission("courseabnormalorder:saveResumeClasses"))-->
+    <!--<a class="btn btn-primary" @click="resumeClasses"><i class="fa fa-pencil-square-o"></i>&nbsp;复课</a>-->
+    <!--#end-->
+    <!--<a class="btn btn-danger" onclick="hq.ui.exportData(null);" style="float: right;">导出</a>-->
+    <!--</div>-->
+    <!--<div>-->
+    <!--<iframe width="100%" height="700" id="excelIframe" frameborder="0" scrolling="auto" src="http://report.hqjy.com/rdppage/main/391ef8a4d66bd076e60263414c49c53c" id="391ef8a4d66bd076e60263414c49c53c">-->
+    <!--</iframe>-->
+    <!--</div>-->
+
+    <!--<table id="jqGrid"></table>-->
+    <!--<div id="jqGridPager"></div>-->
+    <!--</div>-->
+    <!--</div>-->
+
+
+    <div v-show="showList">
+        <div class="grid-btn">
+            <a class="btn btn-default" @click="clearQcousrAbnormalOrder">&nbsp;重置</a>
+            <a class="btn btn-primary" id="getStatisticExcel" @click="getStatisticExcel"><i class='fa fa-search'></i>&nbsp;查询</a>
+            <table class="table table-condensed" border="0">
+                <tr border="0">
+                    <td><input type="text" class="form-control" v-model="qCourseAbnormalOrder.courseName"
+                               readonly="readonly" id="query-courseName"
+                               placeholder="选择课程" @click="selectCourse"></td>
+                    <td><input type="text" class="form-control" v-model="qCourseAbnormalOrder.coursePlan"
+                               readonly="readonly" id="query-coursePlan"
+                               placeholder="选择排课" @click="coursePlanShow"></td>
+                    <td><input type="text" class="form-control" v-model="qCourseAbnormalOrder.classTeacherId"
+                               readonly="readonly" id="query-headTeacherName"
+                               placeholder="选择班主任" @click="headTeacherShow"></td>
+                    <td><input type="text" class="form-control" v-model="qCourseAbnormalOrder.className"
+                               readonly="readonly" id="query-className"
+                               placeholder="选择班级" @click="classLayerShow">
+                    <td><input type="text" class="form-control" id="nickName" placeholder="学员姓名">
+                    </td>
+                    <td><input type="text" class="form-control"
+                               id="mobile" placeholder="学员号码">
+                    </td>
+                </tr>
+                <tr border="0">
+                    <td><input type="text" class="form-control"
+                               id="attendRateStart" placeholder="总出勤率最小值">
+                    </td>
+                    <td><input type="text" class="form-control"
+                               id="attendRateEnd" placeholder="总出勤率最大值">
+                    </td>
+                    <td><input type="text" class="form-control"
+                               id="passRateStart" placeholder="达标率最小值">
+                    </td>
+                    <td><input type="text" class="form-control"
+                               id="passRateEnd" placeholder="达标率最大值">
+                    </td>
+
+                    <td><input type="text" class="insertTime form-control" id="qStartTime"
+                               v-model="qCourseAbnormalOrder.startTime"
+                               readonly="readonly" @keyup.enter="query" placeholder="开始日期">
+                    </td>
+                    <td><input type="text" class="insertTime form-control" v-model="qCourseAbnormalOrder.startTime"
+                               readonly="readonly" id="qEndTime" @keyup.enter="query" placeholder="结束日期">
+                    </td>
+                    <td>
+                        <select class="form-control" v-model="qCourseAbnormalOrder.userplanType" id="studentStatus">
+                            <option value="0">全部</option>
+                            <option value="1">免考核</option>
+                            <option value="2">报考学员</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+    <div>
+        <iframe width="100%" height="650" id="excelIframe" frameborder="0" scrolling="auto" onload="initIframe()"
+                src="http://report.hqjy.com/rdppage/main/391ef8a4d66bd076e60263414c49c53c?studentStatus=0">
+        </iframe>
+    </div>
+</div>
+
+<script src="${rc.contextPath}/js/course/statisticsStudent.js?_${date.systemTime}"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        var osel = document.getElementById("studentStatus"); //得到select的ID
+        var opts = osel.getElementsByTagName("option");//得到数组option
+        opts[0].selected = true;
+    }
+</script>
+#parse("layer/statsticsStudentLay.html")
+#parse("layer/coursePlanShowLay.html")
+#parse("layer/headTeacherStudentLay.html")
+#parse("layer/classStudentLay.html")
+</body>
+</html>

@@ -1,0 +1,50 @@
+<div id="insuranceActionLayDiv" style="display: none">
+<!--根据省份和课程内容和商品ID取得商品子表 -->
+<table  border="0">
+	 	<tr class="row" hidden>
+			<td class="" colspan=4>
+			<label id="goodsId" hidden>当前商品Id</label>
+			<label id="courseId" hidden>课程ID</label>
+			<label id="areaId" hidden>省份id</label>
+			</td>
+			<td><input type="text" class="form-control" id="goodsId"
+				placeholder=""></td>
+		</tr>  
+		<tr class="row">
+			<td class=""><label for="productCode">省份</label></td>
+			<td>	<input type="text" class="form-control"  id="areaName"
+			readonly="readonly" placeholder="点击选择省份" onclick="insuranceActionLay.areaLayerShowDetail();">
+	        </td>
+
+			<td class=""><label for="tuitionFee">课程</label></td>
+			<td><input type="text" id="courseName" class="form-control"   readonly="readonly" placeholder="点击选择课程" 
+			onclick="insuranceActionLay.courseLayerShowDetail();"
+			 >
+		</td>
+			<td><label for="name">是否排序:</label> </td>
+			<td>
+			<select id="sortableInsurance" name="status" form="query" class="form-control">
+					<option value="N">不排序</option>
+					<option value="Y">排序</option>
+			</select>
+			</td>
+		</tr>
+		<tr class="row">
+			<!-- 按钮 -->
+			<td>&nbsp;</td>
+			<td>&nbsp;</td>
+			<td  class="grid-btn" colspan=4 >
+			
+			<a class="btn btn-primary"	 onclick="insuranceActionLay.clear();">重置</a>
+		    <a class="btn btn-primary"	 onclick="insuranceActionLay.reload();">查询</a>
+			 <a class="btn btn-primary"	 onclick="insuranceActionLay.select(1);">投保</a> 
+			 <a class="btn btn-primary"	 onclick="insuranceActionLay.select(0);">取消投保</a> 	</td>
+		</tr>
+	</table>
+<table id="insuranceActionLay_jqGrid" ></table>
+<table id="insuranceActionLay_jqGridPager" ></table>
+</div>
+<script src="${rc.contextPath}/js/layer/insuranceActionLay.js?_${date.systemTime}"></script>
+#parse("layer/areaLay.html")
+
+#parse("layer/courseLay.html")

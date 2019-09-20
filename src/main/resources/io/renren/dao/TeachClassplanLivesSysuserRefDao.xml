@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.TeachClassplanLivesSysuserRefDao">
+
+	<select id="queryList" resultType="io.renren.entity.TeachClassplanLivesSysuserRefEntity">
+		select t.*,u.nick_name as teacherName from teach_classplanlives_sysuser_ref t, sys_user u
+		<where>
+			t.assistant_teacher_id = u.user_id
+			<if test="courseClassplanLivesId != null">
+				and course_classplan_lives_id = #{courseClassplanLivesId}
+			</if>
+		</where>
+	</select>
+
+	<insert id="saveBatch">
+		insert into teach_classplanlives_sysuser_ref
+		(
+			course_classplan_lives_id,
+			assistant_teacher_id,
+			sys_user_id,
+			create_time
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator="," >
+		(
+			#{item.courseClassplanLivesId},
+			#{item.assistantTeacherId},
+			#{item.sysUserId},
+            now()
+		)
+		</foreach>
+	</insert>
+	
+	<delete id="delete">
+		delete from teach_classplanlives_sysuser_ref where course_classplan_lives_id = #{courseClassplanLivesId}
+	</delete>
+</mapper>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title></title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model.trim="q.courseName" @keyup.enter="query" placeholder="课程名称">
+            </div>
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model.trim="q.sectionNo" @keyup.enter="query" placeholder="节编码">
+            </div>
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model.trim="q.sectionName" @keyup.enter="query" placeholder="节名称">
+            </div>
+            <a class="btn btn-primary" @click="clearQuery">重置</a>
+
+            <a class="btn btn-primary" @click="query"><i class='fa fa-search'></i>&nbsp;查询</a>
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+            <div class="form-group" style="display:none">
+			   	<div class="col-sm-2 control-label">ID</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csSectionRecord.sectionId" placeholder="ID"/>
+			    </div>
+            </div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csSectionRecord.sectionName" placeholder="名称"/>
+			    </div>
+			</div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">编码</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csSectionRecord.sectionNo" placeholder="编码"/>
+			    </div>
+			</div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">课程PK</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csSectionRecord.courseId" placeholder="课程PK"/>
+			    </div>
+			</div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">更新时间戳</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csSectionRecord.updateTime" placeholder="更新时间戳"/>
+			    </div>
+			</div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">创建时间戳</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csSectionRecord.createTime" placeholder="创建时间戳"/>
+			    </div>
+			</div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">删除标记 0.正常; 1.删除</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csSectionRecord.dr" placeholder="删除标记 0.正常; 1.删除"/>
+			    </div>
+			</div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">排序</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csSectionRecord.orderNum" placeholder="排序"/>
+			    </div>
+			</div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">章PK</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="csSectionRecord.chapterId" placeholder="章PK"/>
+			    </div>
+			</div>
+            <div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/course-service/cssectionrecord.js?_${date.systemTime}"></script>
+</body>
+</html>

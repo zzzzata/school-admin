@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>商品-投保金额-产品编码档案</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+ 		
+			<table class="table table-condensed" border="0">
+				<tr border="0">  
+				 
+				 
+				 
+					  <td><label for="insuranceInfoId">Id</label></td>
+					  
+					<td><input type="text" class="form-control" v-model.trim="q.insuranceInfoId" id="insuranceInfoId"></td>
+					 <td><label for="insuranceType">投保类型</label></td>
+					  
+					 
+					
+					<td>
+                        <select class="form-control" v-model="q.insuranceType" id="insuranceType">
+                            <option value="">全部</option>
+                            <option value="0">全保</option>
+                            <option value="1">单科</option>
+                        </select>
+                    </td>
+					<td><label for="tuitionFee">学费金额:</label></td>
+					<td><input type="text" class="form-control"  v-model.trim="q.tuitionFee" id="tuitionFee"></td>
+ 					
+                    <td><label for="premium">投保金额  :</label></td>
+					<td><input type="text" class="form-control" v-model.trim="q.premium" id="premium"></td>
+					 
+					  <td><label for="premium">赔付金额  :</label></td>
+					<td><input type="text" class="form-control" v-model.trim="q.compensationAmount" id="compensationAmount"></td>
+					 
+					 
+					  <td><label for="productCode">誉好产品编码</label></td>
+					  
+					<td><input type="text" class="form-control" v-model.trim="q.productCode" id="productCode"></td>
+					 
+					
+					
+					
+                    </tr><tr>
+					    #if($shiro.hasPermission("insurance:insuranceInfo:list"))
+					<td   colspan="12" >  <a class="btn btn-primary" @click="query">查询</a> 					
+					    #end
+					 <a class="btn btn-primary" @click="queryClear">清空条件</a> 
+				      #if($shiro.hasPermission("insurance:insuranceInfo:save"))
+					 	<a class="btn btn-primary" @click="add"><i class="fa fa-pencil-square-o"></i>&nbsp;新增</a> 
+					 #end
+					 #if($shiro.hasPermission("insurance:insuranceInfo:update"))
+					 
+					 	<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a> 
+					#end
+					 #if($shiro.hasPermission("insurance:insuranceInfo:delete"))
+					 
+					 	<a class="btn btn-primary" @click="del"><i class="fa fa-pencil-square-o"></i>&nbsp;删除</a></td>
+					 
+					#end
+				 </tr>
+			</table>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+      <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+				<div class="form-group">
+					<div class="col-sm-2 control-label">Id</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="info.insuranceInfoId"
+							disabled="true" />
+					</div>
+				</div>
+				
+				
+				<div class="form-group">
+					<div class="col-sm-2 control-label">誉好产品编码</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="info.productCode"
+					  />
+					</div>
+				</div>
+				
+				
+				<div class="form-group">
+			   	<div class="col-sm-2 control-label">投保类型</div>
+			   	<div class="col-sm-10">
+			    
+			      
+			       <label class="radio-inline">
+				  <input type="radio" name="sex" value="0" v-model.trim="info.insuranceType"/> 全保
+				</label>
+				<label class="radio-inline">
+				  <input type="radio" name="sex" value="1" v-model.trim="info.insuranceType"/> 单科
+				</label>
+			    
+			      
+			      
+			    </div>
+		 </div>
+		 
+		 
+				<div class="form-group">
+					<div class="col-sm-2 control-label">学费金额：</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="info.tuitionFee" />
+					</div>
+				</div>
+
+
+				<div class="form-group">
+					<div class="col-sm-2 control-label">投保金额：</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="info.premium" />
+					</div>
+				</div>
+				
+				 <div class="form-group">
+					<div class="col-sm-2 control-label">赔付金额：</div>
+					<div class="col-sm-10">
+						<input type="text" class="form-control" v-model="info.compensationAmount" />
+					</div>
+				</div>
+			
+			 
+										<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+    
+    
+    
+    
+    
+     
+</div>
+
+<script src="${rc.contextPath}/js/insurance/insuranceInfo.js?_${date.systemTime}"></script> 
+
+#parse("layer/teacherLay.html")
+</body>
+</html>

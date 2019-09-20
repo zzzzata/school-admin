@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.UserInfoLogDao">
+	 
+	<insert id="save" parameterType="io.renren.entity.UserInfoLogEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into user_info_log
+		(
+			`createTime`, 
+			`user_mobile_str`, 
+			`user_id_str`,  
+			`nc_user_id_str`,  
+			`message_user_mobile`, 
+			`message_user_id`,  
+			`message_nc_user_id`,  
+			`push_json`, `type`,
+			`remark`
+			
+			 
+			
+			
+		)
+		values
+		(
+			#{createtime}, 
+			#{userMobileStr}, 
+			#{userIdStr}, 
+			 #{ncUserIdStr}, 
+			 #{MessageUserMobile}, 
+			#{MessageUserId}, 
+			 #{MessageNcUserId}, 
+			#{pushJson}, #{type}, 
+			#{remark}
+		)
+	</insert>
+
+</mapper>

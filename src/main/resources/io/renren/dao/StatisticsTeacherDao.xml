@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.StatisticsTeacherDao">
+
+
+    <select id="getNamesByIds" parameterType="io.renren.pojo.course.SubjectStatisticsPOJO"
+            resultType="io.renren.pojo.course.SubjectStatisticsPOJO">
+        SELECT
+			t.id as teamId,t.`name` as teamName,u.nick_name as nickName,c.class_name as className,
+			cp.classplan_name as classplanName,cu.course_name as courseName
+		FROM
+			sys_team t,
+			sys_user_team ut,
+			sys_user u,
+			mall_class c,
+			courses cu,
+			course_classplan cp
+		WHERE
+			t.id = ut.team_id
+		AND u.user_id = c.user_id
+		AND cu.course_id = cp.course_id
+		AND ut.user_id = #{sysUserId}
+		AND c.class_id = #{classId}
+		AND cu.course_id = #{courseId}
+		AND cp.classplan_id = #{classplanId}
+		AND u.user_id=#{sysUserId}
+    </select>
+
+
+	<select id="countWisedomCourse" parameterType="java.lang.String" resultType="java.lang.Integer">
+		select count(exam_stage_id) from course_classplan_lives l where l.classplan_id=#{classPlanId}
+	</select>
+
+
+
+
+
+
+
+
+
+</mapper>

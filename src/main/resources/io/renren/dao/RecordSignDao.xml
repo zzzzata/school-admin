@@ -1,0 +1,949 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.RecordSignDao">
+
+
+    <!-- 通用查询表头 -->
+    <sql id="base_column">
+	s.record_sign_id recordSignId,
+	s.record_id recordId, 
+	u.nick_name name, 
+	u.sex sex,   
+	u.mobile mobile, 
+	s.record_id recordId,
+	s.course_name courseName,
+	s.reg_date regDate,
+	s.bdyx bdyx,
+	s.zy zy,
+	s.class_name className,
+	s.level level,
+	s.status status,
+	s.order_id orderId,
+	s.user_id userId,
+	s.nc_id ncId,
+	s.create_time createTime,
+	s.ts ts,
+	s.sync_time syncTime  
+	</sql>
+    <!-- 通用查询条件 -->
+    <sql id="base_where">
+    	where 1=1 	</sql>
+    <!-- 通用from -->
+    <sql id="base_from">
+    	 from record_sign as s left join users u on s.user_id=u.user_id 
+    	 left join mall_order o on s.order_id = o.order_id
+	</sql>
+
+    <!--根据ID查询-->
+    <select id="queryObject" resultType="io.renren.entity.RecordSignEntity">
+        select
+        <include refid="base_column"/>
+        <include refid="base_from"/>
+        <include refid="base_where"/>
+        AND s.record_sign_id = #{recordSignId}
+    </select>
+
+    <!--分页列表-->
+    <select id="queryList" resultType="io.renren.entity.RecordSignEntity">
+        select
+        <include refid="base_column"/>
+        <include refid="base_from"/>
+        <include refid="base_where"/>
+
+        <if test="className != null and className.trim() != ''">
+            and s.class_name like concat('%',#{className},'%')
+        </if>
+        <if test="name != null and name.trim() != ''">
+            and u.nick_name =#{name}
+        </if>
+        <if test="mobile != null and mobile.trim() != ''">
+            and u.mobile = #{mobile}
+        </if>
+        <if test="orderId != null  ">
+            and s.order_id =#{orderId}
+        </if>
+        <if test="userId!= null  ">
+            and s.user_id =#{userId}
+        </if>
+
+        <if test="dr != null  ">
+            and IFNULL(o.dr,0)=#{dr}
+        </if>
+
+
+        <if test="classId != null and classId.trim() != ''">
+            and IFNULL(o.class_id,0) =#{classId}
+        </if>
+        <if test="recordId != null and recordId.trim() != ''">
+            and s.record_id =#{recordId}
+        </if>
+        <if test="ncId != null and ncId.trim() != ''">
+            and s.nc_id =#{ncId}
+        </if>
+        order by s.record_sign_id desc
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+    <!--分页总数-->
+    <select id="queryTotal" resultType="int">
+        select count(1)
+        <include refid="base_from"/>
+        <include refid="base_where"/>
+
+        <if test="className != null and className.trim() != ''">
+            and s.class_name like concat('%',#{className},'%')
+        </if>
+        <if test="name != null and name.trim() != ''">
+            and u.nick_name =#{name}
+        </if>
+        <if test="mobile != null and mobile.trim() != ''">
+            and u.mobile #{mobile}
+        </if>
+        <if test="orderId != null  ">
+            and s.order_id =#{orderId}
+        </if>
+        <if test=" userId!= null  ">
+            and s.user_id =#{userId}
+        </if>
+        <if test="dr != null  ">
+            and IFNULL(o.dr,0)=#{dr}
+        </if>
+        <if test="classId != null and classId.trim() != ''">
+            and IFNULL(o.class_id,0) =#{classId}
+        </if>
+
+        <if test="recordId != null and recordId.trim() != ''">
+            and s.record_id =#{recordId}
+        </if>
+        <if test="ncId != null and ncId.trim() != ''">
+            and s.nc_id =#{ncId}
+        </if>
+    </select>
+    <!--新增-->
+    <insert id="save" parameterType="io.renren.entity.RecordSignEntity" useGeneratedKeys="true" keyProperty="id">
+	insert into record_sign
+	(
+	`record_sign_id`, `user_id`,
+	`record_id`,
+	`course_name`,
+	`reg_date`,
+	`bdyx`,
+	`zy`,
+	`class_name`,
+	`level`,
+	`status`,
+	`order_id`,
+	`nc_id`,
+	`create_time`,
+	`ts`,
+	`sync_time`,
+
+	`class_type`,
+	`approval_date`,
+	`campus_phone`,
+	`emergency_contact`,
+	`emergency_phone`,
+	`consultant`,
+	`is_recommend`,
+	`recommend_teacher`,
+	`train_consultant`,
+	`cash_date`,
+	`zk_study_status`,
+	`zk_record_status`,
+	`zk_college`,
+	`zk_graduate_date`,
+	`zk_major`,
+	`bk_major`,
+	`bk_college`,
+	`politics_status`,
+	`hj`,
+	`is_insurant`
+
+	)
+	values
+	(
+	#{recordSignId}, #{userId},
+	#{recordId},
+	#{courseName},
+	#{regDate},
+	#{bdyx},
+	#{zy},
+	#{className},
+	#{level},
+	#{status},
+	#{orderId},
+	#{ncId},
+	#{createTime},
+	#{ts},
+	#{syncTime},
+
+	#{classtype},
+	#{approvalDate},
+	#{campusPhone},
+	#{emergencyContact},
+	#{emergencyPhone},
+	#{consultant},
+	#{isRecommend},
+	#{recommendTeacher},
+	#{trainConsultant},
+	#{cashDate},
+	#{zkStudyStatus},
+	#{zkRecordStatus},
+	#{zkCollege},
+	#{zkGraduateDate},
+	#{zkMajor},
+	#{bkMajor},
+	#{bkCollege},
+	#{politicsStatus},
+	#{hj},
+	#{isInsurant}
+
+	)
+	</insert>
+
+    <!--修改-->
+    <update id="update" parameterType="io.renren.entity.RecordSignEntity">
+        update record_sign
+        <set>
+            <if test="classtype != null">`class_type` = #{classtype},</if>
+            <if test="approvalDate != null">`approval_date` = #{approvalDate},</if>
+            <if test="campusPhone != null">`campus_phone` = #{campusPhone},</if>
+            <if test="emergencyContact != null">`emergency_contact` = #{emergencyContact},</if>
+            <if test="emergencyPhone != null">`emergency_phone` = #{emergencyPhone},</if>
+            <if test="consultant != null">`consultant` = #{consultant},</if>
+            <if test="isRecommend != null">`is_recommend` = #{isRecommend},</if>
+            <if test="recommendTeacher != null">`recommend_teacher` = #{recommendTeacher},</if>
+            <if test="trainConsultant != null">`train_consultant` = #{trainConsultant},</if>
+            <if test="cashDate != null">`cash_date` = #{cashDate},</if>
+            <if test="zkStudyStatus != null">`zk_study_status` = #{zkStudyStatus},</if>
+            <if test="zkRecordStatus != null">`zk_record_status` = #{zkRecordStatus},</if>
+            <if test="zkCollege != null">`zk_college` = #{zkCollege},</if>
+            <if test="zkGraduateDate != null">`zk_graduate_date` = #{zkGraduateDate},</if>
+            <if test="zkMajor != null">`zk_major` = #{zkMajor},</if>
+            <if test="bkMajor != null">`bk_major` = #{bkMajor},</if>
+            <if test="bkCollege != null">`bk_college` = #{bkCollege},</if>
+            <if test="politicsStatus != null">`politics_status` = #{politicsStatus},</if>
+            <if test="hj != null">`hj` = #{hj},</if>
+            <if test="isInsurant != null">`is_insurant` = #{isInsurant},</if>
+
+
+            <if test="recordId != null">`record_id` = #{recordId},</if>
+            <if test="orderId != null">`order_id` = #{orderId},</if>
+            <if test="userId != null">`user_id` = #{userId},</if>
+            <if test="courseName != null">`course_name` = #{courseName},</if>
+            <if test="regDate != null">`reg_date` = #{regDate},</if>
+            <if test="bdyx != null">`bdyx` = #{bdyx},</if>
+            <if test="zy != null">`zy` = #{zy},</if>
+            <if test="className != null">`class_name` = #{className},</if>
+            <if test="level != null">`level` = #{level},</if>
+            <if test="status != null">`status` = #{status},</if>
+            <if test="ncId != null">`nc_id` = #{ncId},</if>
+            <if test="createTime != null">`create_time` = #{createTime},</if>
+            <if test="ts != null">`ts` = #{ts},</if>
+            <if test="syncTime != null">`sync_time` = #{syncTime}</if>
+
+        </set>
+        <include refid="base_where"/>
+        AND record_sign_id = #{recordSignId}
+    </update>
+
+    <!--删除-->
+    <delete id="delete">
+        DELETE FROM record_sign
+        <include refid="base_where"/>
+        AND record_sign_id = #{recordSignId}
+    </delete>
+
+    <!--批量删除-->
+    <delete id="deleteBatch">
+        DELETE FROM record_sign
+        <include refid="base_where"/>
+        AND record_sign_id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <!-- 批量修改 -->
+    <update id="updateBatch">
+        update record_sign set status = #{status} where record_sign_id in
+        <foreach item="id" collection="list" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <!--分页列表-->
+    <select id="queryPOJOList" resultType="io.renren.pojo.RecordSignPOJO">
+        select
+        s.record_sign_id recordSignId,
+        o.nc_code ncCode,
+        s.reg_date regDate,
+        s.zy zy,
+        cls.class_name className,
+        o.dr dr,
+        (SELECT return_status FROM `return_visit` where record_sign_id = s.record_sign_id and dr=0 	AND
+        expect_time is not null AND	expect_time &lt;= now() order by id desc limit 1) rstatus,
+        s.bdyx bdyx,
+        u.mobile mobile,
+        (select nick_name from sys_user where sys_user.user_id=i.modify_person) modifyPerson,
+        i.modify_time modifyTime,
+        crecord.status cstatus,
+        s.class_type classType,
+        s.approval_date approvalDate,
+        s.campus_phone campusPhone,
+        s.emergency_contact emergencyContact,
+        s.emergency_phone emergencyPhone,
+        s.consultant consultant,
+        s.is_recommend isRecommend,
+        s.recommend_teacher recommendTeacher,
+        s.train_consultant trainConsultant,
+        s.cash_date cashDate,
+        s.zk_study_status zkStudyStatus,
+        s.zk_record_status zkRecordStatus,
+        s.zk_college zkCollege,
+        s.zk_graduate_date zkGraduateDate,
+        s.zk_major zkMajor,
+        s.bk_major bkMajor,
+        s.bk_college bkCollege,
+        s.politics_status politicsStatus,
+        s.hj hj,
+        s.is_insurant isInsurant,
+        i.send_address sendAddress,
+
+        s.course_name courseName,
+        s.order_id orderId,
+        s.user_id userId,
+        s.follow_status followStatus,
+        s.follow_time followTime,
+        s.follow_content followContent,
+        i.record_id recordId,
+        u.nick_name name,
+        u.sex sex,
+        i.id_card idCard,
+        i.age age,
+        i.record record,
+        u.mobile mobile,
+        i.qq qq,
+        i.marriage_status marriageStatus,
+        i.fertility_status fertilityStatus,
+        i.post_name postName,
+        i.Accounting_certificates accountingCertificates,
+        i.nc_student_id ncStudentId,
+        i.chird_count chirdCount,
+        i.student_target studentTarget,
+        i.certificate certificate,
+        sys_user.nick_name followPersonName,
+        (select name from sys_dept where sys_dept.nc_code = left(d.nc_code, 3)) regionDept,
+        a.area_name areaName,
+        d.name deptName,
+        d.nc_code deptCode,
+        sysTeacher.nick_name teacherName,
+        (select sys_product.product_name from sys_product where sys_product.product_id = o.product_id) productName,
+        o.order_no orderNo
+        from record_sign as s
+        left join record_info i on s.record_id = i.record_id
+        left join users u on s.user_id=u.user_id
+        left join sys_user sys_user on sys_user.user_id=s.follow_person
+        left join mall_order o on s.order_id = o.order_id
+        left join mall_class cls on o.class_id=cls.class_id
+        left join mall_area a on o.area_id = a.area_id
+        left join sys_dept d on o.dept_id = d.dept_id
+        left join sys_user sysTeacher on cls.user_id = sysTeacher.user_id
+        left join contract_record crecord on crecord.order_id=o.order_id
+        <include refid="base_where"/>
+        and u.user_id is not null AND (crecord.dr = 0 or crecord.dr is null)
+        <if test="ncCode != null and ncCode.trim() != ''">
+            and o.nc_code =#{ncCode}
+        </if>
+        <if test="approvalDate != null and approvalDate.trim() != ''">
+            and s.approval_date =#{approvalDate}
+        </if>
+        <if test="dr != null">
+            and o.dr =#{dr}
+        </if>
+        <if test="zy != null and zy.trim() != ''">
+            and s.zy =#{zy}
+        </if>
+        <if test="courseName != null and courseName.trim() != ''">
+            and s.course_name =#{courseName}
+        </if>
+        <if test="startRegDate != null and startRegDate.trim() != ''">
+            and s.reg_date &gt;= #{startRegDate}
+        </if>
+        <if test="endRegDate != null and endRegDate.trim() != ''">
+            and s.reg_date &lt;= #{endRegDate}
+        </if>
+
+        <if test="consultant != null and consultant.trim() != ''">
+            and s.consultant =#{consultant}
+        </if>
+
+        <if test="productId != null ">
+            and o.product_id=#{productId}
+        </if>
+
+        <if test="cstatus != null and cstatus != 3 ">
+            and crecord.status =#{cstatus}
+        </if>
+        <if test="cstatus == 3 ">
+            and crecord.status is null
+        </if>
+        <if test="isInsurant != null">
+            and s.is_insurant =#{isInsurant}
+        </if>
+        <if test="startReceiveDate != null and startReceiveDate.trim() != ''">
+            and s.cash_date &gt;=#{startReceiveDate}
+        </if>
+        <if test="endReceiveDate != null and endReceiveDate.trim() != ''">
+            and s.cash_date &lt;=#{endReceiveDate}
+        </if>
+        <if test="classType != null and classType.trim() != ''">
+            and s.class_type =#{classType}
+        </if>
+
+
+        <if test="name != null and name.trim() != ''">
+            and u.nick_name =#{name}
+        </if>
+        <if test="mobile != null and mobile.trim() != ''">
+            and u.mobile = #{mobile}
+        </if>
+        <if test="teacherId != null">
+            and cls.user_id =#{teacherId}
+        </if>
+        <if test="areaId != null">
+            and o.area_id =#{areaId}
+        </if>
+        <!-- 部门 -->
+        <if test="deptIdList != null and deptIdList.size() > 0">
+            and o.dept_id in
+            <foreach item="deptId" collection="deptIdList" open="(" separator="," close=")">
+                #{deptId}
+            </foreach>
+        </if>
+        <if test="classId != null">
+            and o.class_id =#{classId}
+        </if>
+        <if test="classplanId != null">
+            and
+            s.user_id IN (
+            SELECT
+            userplan.user_id
+            FROM
+            course_userplan userplan
+            LEFT JOIN course_userplan_class userplanClass ON userplanClass.userplan_id = userplan.user_plan_id
+            LEFT JOIN course_userplan_class_detail userplanClassDetail ON userplanClassDetail.userplan_class_id =
+            userplanClass.userplan_class_id
+            WHERE
+            userplanClassDetail.classplan_id = #{classplanId}
+            and userplanClass.dr = 0
+            and userplanClassDetail.dr = 0
+            and userplan.dr = 0
+            )
+        </if>
+        <if test="followStatus != null">
+            and s.follow_status =#{followStatus}
+        </if>
+        group by s.record_sign_id
+        order by s.record_sign_id desc
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+    <!--分页总数-->
+    <select id="queryPOJOTotal" resultType="int">
+        select count(1)
+        from record_sign as s
+        left join users u on s.user_id=u.user_id
+        left join mall_order o on s.order_id = o.order_id
+        left join mall_class cls on o.class_id=cls.class_id
+        left join contract_record crecord on crecord.order_id=o.order_id
+        <include refid="base_where"/>
+        and u.user_id is not null AND (crecord.dr = 0 or crecord.dr is null)
+        <if test="ncCode != null and ncCode.trim() != ''">
+            and o.nc_code =#{ncCode}
+        </if>
+        <if test="approvalDate != null and approvalDate.trim() != ''">
+            and s.approval_date =#{approvalDate}
+        </if>
+        <if test="dr != null">
+            and o.dr =#{dr}
+        </if>
+        <if test="zy != null and zy.trim() != ''">
+            and s.zy =#{zy}
+        </if>
+        <if test="courseName != null and courseName.trim() != ''">
+            and s.course_name =#{courseName}
+        </if>
+        <if test="startRegDate != null and startRegDate.trim() != ''">
+            and s.reg_date &gt;= #{startRegDate}
+        </if>
+        <if test="endRegDate != null and endRegDate.trim() != ''">
+            and s.reg_date &lt;= #{endRegDate}
+        </if>
+
+        <if test="consultant != null and consultant.trim() != ''">
+            and s.consultant =#{consultant}
+        </if>
+
+        <if test="productId != null ">
+            and o.product_id=#{productId}
+        </if>
+
+        <if test="cstatus != null ">
+            and crecord.status =#{cstatus}
+        </if>
+        <if test="isInsurant != null">
+            and s.is_insurant =#{isInsurant}
+        </if>
+        <if test="startReceiveDate != null and startReceiveDate.trim() != ''">
+            and s.cash_date &gt;=#{startReceiveDate}
+        </if>
+        <if test="endReceiveDate != null and endReceiveDate.trim() != ''">
+            and s.cash_date &lt;=#{endReceiveDate}
+        </if>
+        <if test="classType != null and classType.trim() != ''">
+            and s.class_type =#{classType}
+        </if>
+
+
+        <if test="name != null and name.trim() != ''">
+            and u.nick_name =#{name}
+        </if>
+        <if test="mobile != null and mobile.trim() != ''">
+            and u.mobile = #{mobile}
+        </if>
+        <if test="teacherId != null">
+            and cls.user_id =#{teacherId}
+        </if>
+        <if test="areaId != null">
+            and o.area_id =#{areaId}
+        </if>
+        <!-- 部门 -->
+        <if test="deptIdList != null and deptIdList.size() > 0">
+            and o.dept_id in
+            <foreach item="deptId" collection="deptIdList" open="(" separator="," close=")">
+                #{deptId}
+            </foreach>
+        </if>
+        <if test="classId != null">
+            and o.class_id =#{classId}
+        </if>
+        <if test="classplanId != null">
+            and
+            s.user_id IN (
+            SELECT
+            userplan.user_id
+            FROM
+            course_userplan userplan
+            LEFT JOIN course_userplan_class userplanClass ON userplanClass.userplan_id = userplan.user_plan_id
+            LEFT JOIN course_userplan_class_detail userplanClassDetail ON userplanClassDetail.userplan_class_id =
+            userplanClass.userplan_class_id
+            WHERE
+            userplanClassDetail.classplan_id = #{classplanId}
+            and userplanClass.dr = 0
+            and userplanClassDetail.dr = 0
+            and userplan.dr = 0
+            )
+        </if>
+        <if test="followStatus != null">
+            and s.follow_status =#{followStatus}
+        </if>
+    </select>
+    <!--分页列表-->
+    <!--(SELECT return_status FROM `return_visit` where record_sign_id = s.record_sign_id and dr=0 	AND-->
+    <!--expect_time is not null AND	expect_time &lt;= now() order by id desc limit 1) rstatus,-->
+    <select id="queryPOJOListByReturnVisit" resultType="io.renren.pojo.RecordSignPOJO">
+        select * from (select
+        s.record_sign_id recordSignId,
+        o.nc_code ncCode,
+        s.reg_date regDate,
+        s.zy zy,
+        cls.class_name className,
+        o.dr dr,
+        (SELECT return_status FROM `return_visit` where record_sign_id = s.record_sign_id and dr=0 	AND
+        expect_time is not null AND	expect_time &lt;= now() order by id desc limit 1) rstatus,
+        (SELECT count(1) FROM `return_visit` where record_sign_id = s.record_sign_id and dr=0 and return_status=0 and
+        dr=0) rCount,
+        s.bdyx bdyx,
+        u.mobile mobile,
+        (select nick_name from sys_user where sys_user.user_id=i.modify_person) modifyPerson,
+        i.modify_time modifyTime,
+        crecord.status cstatus,
+        s.class_type classType,
+        s.approval_date approvalDate,
+        s.campus_phone campusPhone,
+        s.emergency_contact emergencyContact,
+        s.emergency_phone emergencyPhone,
+        s.consultant consultant,
+        s.is_recommend isRecommend,
+        s.recommend_teacher recommendTeacher,
+        s.train_consultant trainConsultant,
+        s.cash_date cashDate,
+        s.zk_study_status zkStudyStatus,
+        s.zk_record_status zkRecordStatus,
+        s.zk_college zkCollege,
+        s.zk_graduate_date zkGraduateDate,
+        s.zk_major zkMajor,
+        s.bk_major bkMajor,
+        s.bk_college bkCollege,
+        s.politics_status politicsStatus,
+        s.hj hj,
+        s.is_insurant isInsurant,
+        i.send_address sendAddress,
+
+        s.course_name courseName,
+        s.order_id orderId,
+        s.user_id userId,
+        s.follow_status followStatus,
+        s.follow_time followTime,
+        s.follow_content followContent,
+        i.record_id recordId,
+        u.nick_name name,
+        u.sex sex,
+        i.id_card idCard,
+        i.age age,
+        i.record record,
+        i.qq qq,
+        i.marriage_status marriageStatus,
+        i.fertility_status fertilityStatus,
+        i.post_name postName,
+        i.Accounting_certificates accountingCertificates,
+        i.nc_student_id ncStudentId,
+        i.chird_count chirdCount,
+        i.student_target studentTarget,
+        i.certificate certificate,
+        sys_user.nick_name followPersonName,
+        (select name from sys_dept where sys_dept.nc_code = left(d.nc_code, 3)) regionDept,
+        a.area_name areaName,
+        d.name deptName,
+        d.nc_code deptCode,
+        sysTeacher.nick_name teacherName,
+        (select sys_product.product_name from sys_product where sys_product.product_id = o.product_id) productName,
+        o.order_no orderNo
+        from return_visit v
+        left join record_sign s on v.record_sign_id=s.record_sign_id
+        left join record_info i on s.record_id = i.record_id
+        left join users u on s.user_id=u.user_id
+        left join sys_user sys_user on sys_user.user_id=s.follow_person
+        left join mall_order o on s.order_id = o.order_id
+        left join mall_class cls on o.class_id=cls.class_id
+        left join mall_area a on o.area_id = a.area_id
+        left join sys_dept d on o.dept_id = d.dept_id
+        left join sys_user sysTeacher on cls.user_id = sysTeacher.user_id
+        left join users us on us.user_id = v.user_id
+        left join contract_record crecord on crecord.order_id=o.order_id
+
+        <include refid="base_where"/>
+        and u.user_id is not null AND (crecord.dr = 0 or crecord.dr is null)
+        <if test="ncCode != null and ncCode.trim() != ''">
+            and o.nc_code =#{ncCode}
+        </if>
+        <if test="approvalDate != null and approvalDate.trim() != ''">
+            and s.approval_date =#{approvalDate}
+        </if>
+        <if test="dr != null">
+            and o.dr =#{dr}
+        </if>
+        <if test="zy != null and zy.trim() != ''">
+            and s.zy =#{zy}
+        </if>
+        <if test="courseName != null and courseName.trim() != ''">
+            and s.course_name =#{courseName}
+        </if>
+        <if test="startRegDate != null and startRegDate.trim() != ''">
+            and s.reg_date &gt;= #{startRegDate}
+        </if>
+        <if test="endRegDate != null and endRegDate.trim() != ''">
+            and s.reg_date &lt;=#{endRegDate}
+        </if>
+        <if test="consultant != null and consultant.trim() != ''">
+            and s.consultant =#{consultant}
+        </if>
+        <if test="productId != null">
+            and o.product_id =#{productId}
+        </if>
+        <if test="cstatus != null and cstatus != 3 ">
+            and crecord.status =#{cstatus}
+        </if>
+        <if test="cstatus == 3 ">
+            and crecord.status is null
+        </if>
+        <if test="isInsurant != null">
+            and s.is_insurant =#{isInsurant}
+        </if>
+        <if test="startReceiveDate != null and startReceiveDate.trim() != ''">
+            and s.cash_date =#{startReceiveDate}
+        </if>
+        <if test="endReceiveDate != null and endReceiveDate.trim() != ''">
+            and s.cash_date =#{endReceiveDate}
+        </if>
+        <if test="classType != null and classType.trim() != ''">
+            and s.class_type =#{classType}
+        </if>
+
+        <if test="name != null and name.trim() != ''">
+            and u.nick_name =#{name}
+        </if>
+        <if test="mobile != null and mobile.trim() != ''">
+            and u.mobile = #{mobile}
+        </if>
+        <if test="teacherId != null">
+            and cls.user_id =#{teacherId}
+        </if>
+        <if test="areaId != null">
+            and o.area_id =#{areaId}
+        </if>
+        <!-- 部门 -->
+        <if test="deptIdList != null and deptIdList.size() > 0">
+            and o.dept_id in
+            <foreach item="deptId" collection="deptIdList" open="(" separator="," close=")">
+                #{deptId}
+            </foreach>
+        </if>
+        <if test="classId != null">
+            and o.class_id =#{classId}
+        </if>
+        <if test="classplanId != null">
+            and
+            s.user_id IN (
+            SELECT
+            userplan.user_id
+            FROM
+            course_userplan userplan
+            LEFT JOIN course_userplan_class userplanClass ON userplanClass.userplan_id = userplan.user_plan_id
+            LEFT JOIN course_userplan_class_detail userplanClassDetail ON userplanClassDetail.userplan_class_id =
+            userplanClass.userplan_class_id
+            WHERE
+            userplanClassDetail.classplan_id = #{classplanId}
+            and userplanClass.dr = 0
+            and userplanClassDetail.dr = 0
+            and userplan.dr = 0
+            )
+        </if>
+        <if test="followStatus != null">
+            and s.follow_status =#{followStatus}
+        </if>
+        <!-- 新生-未回访 -->
+        <if test="returnType != null and returnType==0">
+            and v.return_status = 0 and v.dr=0
+        </if>
+        <!-- 老生-未回访 -->
+        <if test="returnType != null and returnType==1">
+            and s.last_return_time &lt;=#{lastReturnTime}
+        </if>
+        <!-- 老生-已回访 -->
+        <if test="returnType != null and returnType==4">
+            and s.last_return_time &gt;=#{lastReturnTime}
+        </if>
+        <!-- 新生-回访超期 -->
+        <if test="returnType != null and returnType==2">
+            and v.return_status = 0 and v.dr=0 and v.expect_time &lt;#{nowTime}
+        </if>
+        <!-- 未回访（新生+老生） -->
+        <if test="returnType != null and returnType==3">
+            and (v.return_status = 0 and v.dr=0 or s.last_return_time &lt;= #{lastReturnTime})
+        </if>
+        <!-- 预计回访时间 -->
+        <if test="expectTime != null">
+            and v.expect_time = #{expectTime}
+        </if>
+        group by s.record_sign_id
+        order by s.record_sign_id desc ) result
+        <include refid="base_where"/>
+        <!-- 新生-最新已回访 -->
+        <if test="returnType != null and returnType==5">
+            and result.rstatus = 1
+        </if>
+        <!-- 新生-全部已回访 -->
+        <if test="returnType != null and returnType==6">
+            and result.rstatus = 1 and result.rCount = 0
+        </if>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+    <!--分页总数-->
+    <select id="queryPOJOTotalByReturnVisit" resultType="int">
+        select count(*) from (
+        select *,
+        (SELECT return_status FROM `return_visit` where record_sign_id = temp.record_sign_id and dr=0 AND
+        expect_time is not null AND	expect_time &lt;= now() order by id desc limit 1) rstatus,
+        (SELECT count(*) FROM `return_visit` where record_sign_id = temp.record_sign_id and dr=0 and return_status=0 and
+        dr=0) rcount
+        FROM (
+        select s.record_sign_id
+        FROM return_visit v
+        LEFT JOIN record_sign s
+        ON v.record_sign_id=s.record_sign_id
+        LEFT JOIN users u
+        ON s.user_id=u.user_id
+        LEFT JOIN mall_order o
+        ON s.order_id = o.order_id
+        LEFT JOIN mall_class cls
+        ON o.class_id=cls.class_id
+        LEFT JOIN contract_record crecord
+        ON crecord.order_id=o.order_id
+
+        <include refid="base_where"/>
+        and u.user_id is not null AND (crecord.dr = 0 or crecord.dr is null)
+        <if test="ncCode != null and ncCode.trim() != ''">
+            and o.nc_code =#{ncCode}
+        </if>
+        <if test="approvalDate != null and approvalDate.trim() != ''">
+            and s.approval_date =#{approvalDate}
+        </if>
+        <if test="dr != null">
+            and o.dr =#{dr}
+        </if>
+        <if test="zy != null and zy.trim() != ''">
+            and s.zy =#{zy}
+        </if>
+        <if test="courseName != null and courseName.trim() != ''">
+            and s.course_name =#{courseName}
+        </if>
+        <if test="startRegDate != null and startRegDate.trim() != ''">
+            and s.reg_date &gt;= #{startRegDate}
+        </if>
+        <if test="endRegDate != null and endRegDate.trim() != ''">
+            and s.reg_date &lt;= #{endRegDate}
+        </if>
+
+        <if test="consultant != null and consultant.trim() != ''">
+            and s.consultant =#{consultant}
+        </if>
+
+        <if test="productId != null ">
+            and o.product_id=#{productId}
+        </if>
+
+        <if test="cstatus != null ">
+            and crecord.status =#{cstatus}
+        </if>
+        <if test="isInsurant != null">
+            and s.is_insurant =#{isInsurant}
+        </if>
+        <if test="startReceiveDate != null and startReceiveDate.trim() != ''">
+            and s.cash_date &gt;=#{startReceiveDate}
+        </if>
+        <if test="endReceiveDate != null and endReceiveDate.trim() != ''">
+            and s.cash_date &lt;=#{endReceiveDate}
+        </if>
+        <if test="classType != null and classType.trim() != ''">
+            and s.class_type =#{classType}
+        </if>
+
+        <!-- 新生-未回访 -->
+        <if test="returnType != null and returnType==0">
+            and v.return_status = 0 and v.dr=0
+        </if>
+        <!-- 老生-未回访 -->
+        <if test="returnType != null and returnType==1">
+            and s.last_return_time &lt;=#{lastReturnTime}
+        </if>
+        <!-- 老生-已回访 -->
+        <if test="returnType != null and returnType==4">
+            and s.last_return_time &gt;=#{lastReturnTime}
+        </if>
+        <!-- 新生-回访超期 -->
+        <if test="returnType != null and returnType==2">
+            and v.return_status = 0 and v.dr=0 and v.expect_time &lt;#{nowTime}
+        </if>
+        <!-- 未回访（新生+老生） -->
+        <if test="returnType != null and returnType==3">
+            and (v.return_status = 0 and v.dr=0 or s.last_return_time &lt;= #{lastReturnTime})
+        </if>
+        <!-- 预计回访时间 -->
+        <if test="expectTime != null">
+            and v.expect_time = #{expectTime}
+        </if>
+
+
+        <if test="name != null and name.trim() != ''">
+            and u.nick_name =#{name}
+        </if>
+        <if test="mobile != null and mobile.trim() != ''">
+            and u.mobile = #{mobile}
+        </if>
+        <if test="teacherId != null">
+            and cls.user_id =#{teacherId}
+        </if>
+        <if test="areaId != null">
+            and o.area_id =#{areaId}
+        </if>
+        <!-- 部门 -->
+        <if test="deptIdList != null and deptIdList.size() > 0">
+            and o.dept_id in
+            <foreach item="deptId" collection="deptIdList" open="(" separator="," close=")">
+                #{deptId}
+            </foreach>
+        </if>
+        <if test="classId != null">
+            and o.class_id =#{classId}
+        </if>
+        <if test="classplanId != null">
+            and
+            s.user_id IN (
+            SELECT
+            userplan.user_id
+            FROM
+            course_userplan userplan
+            LEFT JOIN course_userplan_class userplanClass ON userplanClass.userplan_id = userplan.user_plan_id
+            LEFT JOIN course_userplan_class_detail userplanClassDetail ON userplanClassDetail.userplan_class_id =
+            userplanClass.userplan_class_id
+            WHERE
+            userplanClassDetail.classplan_id = #{classplanId}
+            and userplanClass.dr = 0
+            and userplanClassDetail.dr = 0
+            and userplan.dr = 0
+            )
+        </if>
+        <if test="followStatus != null">
+            and s.follow_status =#{followStatus}
+        </if>
+
+        group by s.record_sign_id)temp) result
+        <include refid="base_where"/>
+        <!-- 新生-最新已回访 -->
+        <if test="returnType != null and returnType==5">
+            and result.rstatus = 1
+        </if>
+        <!-- 新生-全部已回访 -->
+        <if test="returnType != null and returnType==6">
+            and result.rstatus = 1 and result.rCount = 0
+        </if>
+
+    </select>
+    <select id="findRecordSignById" resultType="io.renren.entity.RecordSignEntity">
+      select last_return_time lastReturnTime from record_sign WHERE record_sign_id= #{recordSignId}
+    </select>
+    <!--修改-->
+    <update id="updateFollowStatus" parameterType="io.renren.entity.RecordSignEntity">
+        update record_sign
+        <set>
+            follow_status = #{followStatus},
+            follow_person = #{followPerson},
+            follow_time = #{followTime},
+            follow_content = #{followContent}
+        </set>
+        where record_sign_id = #{recordSignId}
+    </update>
+    <!--修改-->
+    <update id="updateReturnTime" parameterType="io.renren.entity.RecordSignEntity">
+        update record_sign
+        <set>
+            last_return_time = #{lastReturnTime}
+        </set>
+        where record_sign_id = #{recordSignId}
+    </update>
+    <update id="updateSaveReturnTime">
+        update record_sign
+        <set>
+            last_return_time = #{lastReturnTime}
+        </set>
+        where record_sign_id = #{recordSignId} and last_return_time is not null
+    </update>
+
+
+</mapper>

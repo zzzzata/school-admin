@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.TeachFileDao">
+
+	
+	<!--根据filekey查询-->
+	<select id="queryListByFileKey" resultType="io.renren.entity.TeachFileEntity">
+		SELECT *
+		FROM teach_file
+		WHERE file_key = #{fileKey}
+		AND status = 1
+	</select>
+
+	<insert id="save"  parameterType="io.renren.entity.TeachFileEntity" useGeneratedKeys="true" keyProperty="number">
+		insert into teach_file
+		(
+			`id`,
+			`name`,
+			`file_Key`,
+			`url`,
+			`suffix`,
+			`type`,
+			`size`,
+			`create_time`,
+			`status`,
+			`sys_user_id`
+		)
+		values
+		(
+			#{id},
+			#{name},
+			#{fileKey},
+			#{url},
+			#{suffix},
+			#{type},
+			#{size},
+			#{createTime},
+			#{status},
+			#{sysUserId}
+		)
+	</insert>
+</mapper>

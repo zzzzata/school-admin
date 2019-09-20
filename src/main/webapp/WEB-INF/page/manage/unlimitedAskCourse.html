@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>无限次提问班型管理</title>
+    #parse("sys/header.html")
+</head>
+<body>
+<div id="app">
+    <div v-show="showList">
+        <div class="grid-btn">
+            <form class="form-inline" style="margin-top: 5px;">
+                #if($shiro.hasPermission("teacherTipAuthority:list"))
+                <div class="form-group">
+                    <label >班型ID:</label>
+                    <input type="text" class="form-control" placeholder="输入班型ID" v-model="course.courseId">
+                </div>
+                <div class="form-group">
+                    <label>班型名称:</label>
+                    <input type="text" class="form-control" placeholder="输入班型名称" v-model="course.courseName">
+                </div>
+                <a style="margin-left: 10px" class="btn btn-default" @click="clearQuery">重置</a>
+                <a class="btn btn-primary" @click="query"><i class='fa fa-search'></i>&nbsp;查询</a>
+                #end
+                #if($shiro.hasPermission("teacherTipAuthority:update"))
+                <a class="btn btn-primary" @click="addCourse"><i class="fa fa-pencil-square-o"></i>&nbsp;新增</a>
+                <a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+                <a class="btn btn-primary" @click="deleteCourse"><i class="fa fa-pencil-square-o"></i>&nbsp;删除</a>
+                #end
+            </form>
+        </div>
+        <table id="jqGrid"></table>
+        <div id="jqGridPager"></div>
+    </div>
+
+    <div v-show="!showList" class="panel panel-default">
+        <div class="panel-heading">{{title}}</div>
+        <form class="form-horizontal">
+            <div class="form-group">
+                <div class="col-sm-2 control-label">班型ID</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="editorCourse.courseId" placeholder="输入NC登记的班型ID"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">班型名称</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model="editorCourse.courseName" placeholder="输入班型名称"/>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label"></div>
+                <input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+                &nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+            </div>
+        </form>
+    </div>
+</div>
+<script src="${rc.contextPath}/js/manage/unlimitedAskCourse.js?_${date.systemTime}"></script>
+</body>
+</html>

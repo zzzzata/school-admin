@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.CourseClassplanCheckoutDao">
+	<select id="getUserByPhone" parameterType="String" resultType="io.renren.entity.UsersEntity">
+		select user_id from users where mobile = #{phoneNum} and dr = 0 and status = 1
+	</select>
+	
+	<select id="getOrderByNo" parameterType="String" resultType="io.renren.entity.MallOrderEntity">
+		select 
+			order_id as orderId,
+			order_no as orderNo,
+			user_id as userId,
+			commodity_id as commodityId,
+			class_type_id as classTypeId
+		from 
+			mall_order 
+		where 
+			order_no = #{orderNo} and dr = 0
+	</select>
+	
+	<select id="getGoodById" parameterType="Long" resultType="io.renren.entity.MallGoodsInfoEntity">
+		select id from mall_goods_info where id = #{goodId} and dr = 0 and is_audited = 1
+	</select>
+	
+	<select id="getClassplanLiveById" parameterType="String" resultType="io.renren.entity.CourseClassplanLivesEntity">
+		select 
+			classplan_live_id as classplanLiveId,
+			classplan_id as classplanId,
+			live_class_type_ids as liveClassTypeIds,
+			course_id as courseId
+		from 
+			course_classplan_lives
+		where
+			classplan_live_id = #{classplanliveId} and dr = 0
+	</select>
+	
+	<select id="getUserplanByOrderNo" parameterType="String" resultType="io.renren.entity.CourseUserplanEntity">
+		select
+			user_plan_id as userPlanId
+		from
+			course_userplan
+		where
+			order_no = #{orderNo} and dr = 0
+			limit 1
+	</select>
+	
+	<select id="getUserplanDetailsByUserPlanId" parameterType="Long" resultType="io.renren.entity.CourseUserplanDetailEntity">
+		select
+			userplan_detail_id as userplanDetailId,
+			userplan_id as userplanId,
+			course_id as courseId
+		from
+			course_userplan_detail
+		where
+			userplan_id = #{userPlanId} and dr = 0
+	</select>
+	
+	<select id="getUserplanDetailsByMap" parameterType="map" resultType="map">
+		SELECT
+			course_classplan.classplan_name AS classPlanName,
+			course_userplan_class_detail.`timestamp` AS timeStamps,
+			course_userplan_class.userplan_class_no AS userplanClassNo,
+			course_userplan_class.userplan_class_id AS userplanClassId,
+			course_userplan_class_detail.userplan_class_detail_id AS userplanClassDetailId
+		FROM
+			course_userplan_class_detail AS course_userplan_class_detail,
+			course_userplan_class AS course_userplan_class,
+			course_classplan AS course_classplan
+		WHERE
+			course_userplan_class_detail.userplan_detail_id = #{userplanDetailId}
+		AND course_userplan_class_detail.classplan_id = #{classplanId}	
+		AND course_userplan_class_detail.dr = 0
+		AND course_userplan_class.userplan_class_id = course_userplan_class_detail.userplan_class_id
+		AND course_userplan_class.dr = 0
+		AND course_userplan_class.`status` = 1
+		AND course_classplan.classplan_id = course_userplan_class_detail.classplan_id
+		AND course_classplan.dr = 0
+		AND course_classplan.`status` = 1
+		AND course_classplan.is_audited = 1
+		AND course_classplan.course_id = #{courseId}
+		ORDER BY course_userplan_class_detail.`timestamp` DESC
+		LIMIT 1
+	</select>
+</mapper>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.renren.dao.HangjiaCommoditySyncDao">
+    <!-- 查找商品 -->
+    <select id="selectGoods" resultType="io.renren.entity.MallGoodsInfoEntity">
+        SELECT * FROM mall_goods_info
+        WHERE dr = 0
+        <if test="goodsId != null">AND `hj_goods_id` = #{goodsId}</if>
+    </select>
+
+    <!-- 查找商品详情 -->
+    <select id="selectGoodsDetails" resultType="io.renren.entity.MallGoodsDetailsEntity">
+        SELECT * FROM mall_goods_details
+        WHERE dr = 0
+        <if test="goodsId != null">AND `hj_goods_id` = #{goodsId}</if>
+    </select>
+
+    <!-- 删除商品-->
+    <update id="delGoods" parameterType="Long">
+        UPDATE mall_goods_info
+        set dr = 1
+        WHERE hj_goods_id =#{goodsId}
+    </update>
+
+    <!-- 删除商品详情表 -->
+    <update id="delGoodsDetail" parameterType="Long">
+        UPDATE mall_goods_details
+        set dr = 1
+        WHERE hj_goods_id =#{goodsId}
+    </update>
+
+    <!-- 增加商品 -->
+    <insert id="addGoods" parameterType="io.renren.entity.MallGoodsInfoEntity" useGeneratedKeys="true"
+            keyProperty="id">
+		insert into mall_goods_info
+		(
+		    `id`,
+            `name`,
+            `class_type_id`,
+            `thumb_path`,
+            `origin_path`,
+            `present_price`,
+            `original_price`,
+            `status`,
+            `profession_id`,
+            `level_id`,
+            `is_audited`,
+            `create_person`,
+            `create_time`,
+            `modify_time`,
+            `school_id`,
+            `dr`,
+            `m_id`,
+            `day_validity`,
+            `product_id`,
+            `only_one`,
+            `good_recomment`,
+            `hj_goods_id`,
+            `goods_category_id`,
+            `project_type`
+            )
+            values
+            (
+            #{id},
+            #{name},
+            #{classTypeId},
+            #{thumbPath},
+            #{originPath},
+            #{presentPrice},
+            #{originalPrice},
+            #{status},
+            #{professionId},
+            #{levelId},
+            #{isAudited},
+            #{createPerson},
+            #{createTime},
+            #{modifyTime},
+            #{schoolId},
+            #{dr},
+            #{mId},
+            #{dayValidity},
+            #{productId},
+            #{onlyOne},
+            #{goodRecomment},
+            #{hjGoodsId},
+            #{goodsCategoryId},
+            #{projectType}
+        )
+	</insert>
+
+    <!-- 增加商品详情 -->
+    <insert id="addGoodsDetail" parameterType="io.renren.entity.MallGoodsDetailsEntity" useGeneratedKeys="true"
+            keyProperty="id">
+		insert into mall_goods_details
+		(
+		    `id`,
+            `mall_goods_id`,
+            `mall_area_id`,
+            `course_id`,
+            `is_substituted`,
+            `is_substitute`,
+            `is_united_exam`,
+            `is_suitable`,
+            `school_id`,
+            `order_num`,
+            `dr`,
+            `hj_goods_id`
+            )
+            values
+            (
+            #{id},
+            #{mallGoodsId},
+            #{mallAreaId},
+            #{courseId},
+            #{isSubstituted},
+            #{isSubstitute},
+            #{isUnitedExam},
+            #{isSuitable},
+            #{schoolId},
+            #{orderNum},
+            #{dr},
+            #{hjGoodsId}
+        )
+	</insert>
+
+    <!-- 同步更新商品 -->
+    <update id="updateGoods" parameterType="io.renren.entity.MallGoodsInfoEntity">
+        UPDATE mall_goods_info
+        <set>
+            <if test="name != null">`name` = #{name},</if>
+            <if test="classTypeId != null">`class_type_id` = #{classTypeId},</if>
+            <if test="thumbPath != null">`thumb_path` = #{thumbPath},</if>
+            <if test="originPath != null">`origin_path` = #{originPath},</if>
+            <if test="presentPrice != null">`present_price` = #{presentPrice},</if>
+            <if test="originalPrice != null">`original_price` = #{originalPrice},</if>
+            <if test="status != null">`status` = #{status},</if>
+            <if test="professionId != null">`profession_id` = #{professionId},</if>
+            <if test="levelId != null">`level_id` = #{levelId},</if>
+            <if test="isAudited != null">`is_audited` = #{isAudited},</if>
+            <if test="createPerson != null">`create_person` = #{createPerson},</if>
+            <if test="createTime != null">`create_time` = #{createTime},</if>
+            <if test="modifyTime != null">`modify_time` = #{modifyTime},</if>
+            <if test="schoolId != null">`school_id` = #{schoolId},</if>
+            <if test="dr != null">`dr` = #{dr},</if>
+            <if test="mId != null">`m_id` = #{mId},</if>
+            <if test="dayValidity != null">`day_validity` = #{dayValidity},</if>
+            <if test="productId != null">`product_id` = #{productId},</if>
+            <if test="onlyOne != null">`only_one` = #{onlyOne},</if>
+            <if test="goodRecomment != null">`good_recomment` = #{goodRecomment},</if>
+            <if test="hjGoodsId != null">`hj_goods_id` = #{hjGoodsId},</if>
+            <if test="projectType != null">`project_type` = #{projectType},</if>
+            <if test="goodsCategoryId != null">`goods_category_id` = #{goodsCategoryId}</if>
+        </set>
+        WHERE hj_goods_id = #{hjGoodsId}
+    </update>
+
+    <!-- 同步更新商品详情 -->
+    <update id="updateGoodsDetail" parameterType="io.renren.entity.MallGoodsDetailsEntity">
+        UPDATE mall_goods_details
+        <set>
+            <if test="mallGoodsId != null">`mall_goods_id` = #{mallGoodsId},</if>
+            <if test="mallAreaId != null">`mall_area_id` = #{mallAreaId},</if>
+            <if test="courseId != null">`course_id` = #{courseId},</if>
+            <if test="isSubstituted != null">`is_substituted` = #{isSubstituted},</if>
+            <if test="isSubstitute != null">`is_substitute` = #{isSubstitute},</if>
+            <if test="isUnitedExam != null">`is_united_exam` = #{isUnitedExam},</if>
+            <if test="isSuitable != null">`is_suitable` = #{isSuitable},</if>
+            <if test="schoolId != null">`school_id` = #{schoolId},</if>
+            <if test="orderNum != null">`order_num` = #{orderNum},</if>
+            <if test="dr != null">`dr` = #{dr},</if>
+            <if test="subjectHour != null">`subject_hour` = #{subjectHour},</if>
+            <if test="insuranceCourseStatus != null">`insurance_course_status` = #{insuranceCourseStatus},</if>
+            <if test="hjGoodsId != null">`hj_goods_id` = #{hjGoodsId},</if>
+        </set>
+        WHERE hj_goods_id = #{hjGoodsId}
+    </update>
+
+    <!-- 更新商品的上下架状态 -->
+    <update id="updateGoodsStatus" parameterType="Long">
+        UPDATE mall_goods_info
+        SET status = 1
+        WHERE hj_goods_id =#{goodsId}
+    </update>
+
+    <!-- 更新商品的类目ID  -->
+    <update id="updateGoodsCategoryId">
+        UPDATE mall_goods_info
+        SET goods_category_id = #{goodsCategoryId}
+        WHERE id =#{id}
+    </update>
+
+</mapper>

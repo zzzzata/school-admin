@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.InsuranceInfoDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	 s.tuition_fee as tuitionFee,
+s.premium as premium,
+s.product_code as productCode,
+s.project_code as projectCode,
+s.project_name as projectName,
+s.insurance_info_id as insuranceInfoId,
+s.insurance_type as insuranceType, 
+s.compensation_amount as compensationAmount,
+s.dr as dr,
+s.ts as ts,
+s.creation_time as creationTime 
+
+
+	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	where s.dr=0 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 from insurance_info s 
+	</sql>
+	
+	
+	<sql id="base_query">
+		<if test='tuitionFee != null'>and `tuition_fee` = #{tuitionFee}  </if>
+<if test='premium != null'> and `premium` = #{premium}  </if>
+<if test='compensationAmount != null'> and `compensation_amount` = #{compensationAmount}  </if>
+<if test='productCode != null'>and `product_code` = #{productCode}  </if>
+<if test='projectCode != null'>and `project_code` = #{projectCode}  </if>
+<if test='projectName != null'>and `project_name` = #{projectName}  </if>
+<if test='insuranceInfoId != null'> and`insurance_info_id` = #{insuranceInfoId}  </if>
+<if test='insuranceType != null'>and `insurance_type` = #{insuranceType} </if> 
+<if test='dr != null'>and `dr` = #{dr}  </if>
+<if test='ts != null'>and `ts` = #{ts}  </if>
+<if test='creationTime != null'>and `creation_time` = #{creationTime} </if>
+	</sql>
+	
+	
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.InsuranceInfoEntity">
+		select 
+      	<include refid="base_column"/>  
+      			<include refid="base_from" />
+		<include refid="base_where"/>
+		
+		AND s.insurance_info_id = #{insuranceInfoId}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="io.renren.entity.InsuranceInfoEntity">
+	
+	 select
+		<include refid="base_column" />
+		<include refid="base_from" />
+
+		<include refid="base_where" />
+		<include refid="base_query" />
+
+
+		
+		order by s.insurance_info_id desc
+		 <if test="offset != null and limit != null  ">
+			limit #{offset}, #{limit}
+		</if>
+		 
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+	 select count(0)
+		<include refid="base_from" />
+
+		<include refid="base_where" />
+
+		<include refid="base_query" />
+	 
+	</select>
+	<!-- 根据商品id取得 -->
+	<select id="queryByMallGoodsId" resultType="io.renren.entity.InsuranceInfoEntity">
+
+	select
+	<include refid="base_column" />
+	from mall_goods_info info left   join insurance_info s on
+	info.insurance_info_id=s.insurance_info_id
+
+	where s.dr=0 and info.dr=0 
+	<if test='goodsId != null'>and info.id = #{goodsId}  </if>
+	<if test='goodsId == null'> and 1=2 </if>
+	limit 1
+   </select>
+	
+	<!--新增-->
+	<insert id="save" parameterType="io.renren.entity.InsuranceInfoEntity" useGeneratedKeys="true" keyProperty="insuranceInfoId">
+	insert into insurance_info
+	(
+	`tuition_fee`,
+`premium`,
+`product_code`,
+`project_code`,
+`project_name`,
+`insurance_info_id`,
+`insurance_type`, 
+`compensation_amount`,
+`dr`,
+`ts`,
+`creation_time` 
+
+	)
+	values
+	(
+	#{tuitionFee},
+#{premium},
+#{productCode},
+#{projectCode},
+#{projectName},
+#{insuranceInfoId},
+#{insuranceType}, 
+#{compensationAmount},
+#{dr},
+#{ts},
+#{creationTime}
+
+	)
+
+
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.InsuranceInfoEntity">
+		update insurance_info 
+		<set> 
+	<if test='tuitionFee != null'>`tuition_fee` = #{tuitionFee}, </if>
+<if test='premium != null'>`premium` = #{premium}, </if>
+<if test='productCode != null'>`product_code` = #{productCode}, </if>
+<if test='projectCode != null'>`project_code` = #{projectCode}, </if>
+<if test='projectName != null'>`project_name` = #{projectName}, </if>
+<if test='insuranceInfoId != null'>`insurance_info_id` = #{insuranceInfoId}, </if>
+<if test='insuranceType != null'>`insurance_type` = #{insuranceType}, </if> 
+ <if test='compensationAmount != null'>`compensation_amount` = #{compensationAmount}, </if> 
+<if test='dr != null'>`dr` = #{dr}, </if>
+<if test='ts != null'>`ts` = #{ts}, </if>
+<if test='creationTime != null'>`creation_time` = #{creationTime} </if>
+
+
+		</set>
+		where dr=0 
+		AND `insurance_info_id` = #{insuranceInfoId}
+	</update>
+	
+	<!--删除-->
+	<delete id="delete">
+		  update insurance_info set dr = 1,modified_time = now() 
+		where dr=0 
+		AND insurance_info_id = #{insuranceInfoId}
+	</delete>
+	
+	<!--批量删除-->
+ 
+	  <delete id="deleteBatch">
+        update insurance_info set dr = 1,ts = now() where insurance_info_id in
+        <foreach item="insuranceInfoId" collection="array" open="(" separator="," close=")">
+            #{insuranceInfoId}
+        </foreach>
+    </delete>
+	 
+	 
+	 <select id="checkInsuranceInfoExist" resultType="int">
+        select count(1) from mall_goods_info
+        where dr=0 and insurance_info_id =#{insuranceInfoId}
+         
+    </select>
+	 
+</mapper>

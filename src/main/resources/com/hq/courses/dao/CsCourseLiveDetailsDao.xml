@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hq.courses.dao.CsCourseLiveDetailsDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	cs_course_live_details.live_id AS liveId , 	cs_course_live_details.live_name AS liveName , 	cs_course_live_details.review_name AS reviewName , 	cs_course_live_details.review_url AS reviewUrl , 	cs_course_live_details.prepare_name AS prepareName , 	cs_course_live_details.prepare_url AS prepareUrl , 	cs_course_live_details.courseware_name AS coursewareName , 	cs_course_live_details.courseware_url AS coursewareUrl , 	cs_course_live_details.phase_id AS phaseId , 	cs_course_live_details.phase_name AS phaseName , 	cs_course_live_details.create_time AS createTime , 	cs_course_live_details.create_person AS createPerson , 	cs_course_live_details.update_time AS updateTime , 	cs_course_live_details.update_person AS updatePerson , 	cs_course_live_details.dr AS dr , 	cs_course_live_details.order_num AS orderNum , 	cs_course_live_details.course_id AS courseId 	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE  cs_course_live_details.dr=0 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM cs_course_live_details AS cs_course_live_details
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  live_id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="com.hq.courses.entity.CsCourseLiveDetailsEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND live_id = #{liveId}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="com.hq.courses.entity.CsCourseLiveDetailsEntity">
+		select
+		<include refid="base_column"/>
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+		and course_id = #{courseId}
+		<include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+        and course_id = #{courseId}
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="com.hq.courses.entity.CsCourseLiveDetailsEntity">
+		insert into cs_course_live_details
+		(
+				`live_name`, `review_name`, `review_url`, `prepare_name`, `prepare_url`, `courseware_name`, `courseware_url`, `phase_id`, `phase_name`, `create_person`, `order_num`, `course_id`)
+		values
+		(
+				#{liveName}, #{reviewName}, #{reviewUrl}, 	#{prepareName}, #{prepareUrl}, #{coursewareName}, #{coursewareUrl}, #{phaseId}, #{phaseName},#{createPerson},#{orderNum}, #{courseId})
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="com.hq.courses.entity.CsCourseLiveDetailsEntity">
+		update cs_course_live_details 
+		<set>
+			<if test="liveName != null">`live_name` = #{liveName}, </if>
+			<if test="reviewName != null">`review_name` = #{reviewName}, </if>
+			<if test="reviewUrl != null">`review_url` = #{reviewUrl}, </if>
+			<if test="prepareName != null">`prepare_name` = #{prepareName}, </if>
+			<if test="prepareUrl != null">`prepare_url` = #{prepareUrl}, </if>
+			<if test="coursewareName != null">`courseware_name` = #{coursewareName}, </if>
+			<if test="coursewareUrl != null">`courseware_url` = #{coursewareUrl}, </if>
+			<if test="phaseId != null">`phase_id` = #{phaseId}, </if>
+			<if test="phaseName != null">`phase_name` = #{phaseName}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="createPerson != null">`create_person` = #{createPerson}, </if>
+			<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+			<if test="updatePerson != null">`update_person` = #{updatePerson}, </if>
+			<if test="dr != null">`dr` = #{dr}, </if>
+			<if test="orderNum != null">`order_num` = #{orderNum}, </if>
+			<if test="courseId != null">`course_id` = #{courseId},</if>
+			`sync_status` = 0
+		</set>
+		<include refid="base_where"/>
+		AND live_id = #{liveId}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="com.hq.courses.entity.CsCourseLiveDetailsEntity">
+		UPDATE cs_course_live_details 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND live_id = #{id}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="com.hq.courses.entity.CsCourseLiveDetailsEntity">
+		UPDATE cs_course_live_details 
+		<set> dr = 1,sync_status=0 </set>
+		<include refid="base_where"/>
+		AND live_id IN 
+		<foreach item="liveId" collection="ids" open="(" separator="," close=")">
+			#{liveId}
+		</foreach>
+	</update>
+
+	<!--根据名称查询-->
+	<select id="queryByLiveName" resultType="int">
+		select
+		count(*)
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND live_name = #{liveName}
+	</select>
+</mapper>

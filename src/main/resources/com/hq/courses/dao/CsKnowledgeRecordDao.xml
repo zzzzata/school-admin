@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hq.courses.dao.CsKnowledgeRecordDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	    cs_knowledge_record.knowledge_record_id AS knowledgeRecordId ,cs_knowledge_record.knowledge_id AS knowledgeId , 	cs_knowledge_record.knowledge_name AS knowledgeName , 	cs_knowledge_record.knowledge_no AS knowledgeNo , 	cs_knowledge_record.key_point AS keyPoint , 	cs_knowledge_record.level_id AS levelId , 	cs_knowledge_record.status AS status , 	cs_knowledge_record.section_id AS sectionId , 	cs_knowledge_record.course_id AS courseId , 	cs_knowledge_record.update_time AS updateTime ,
+		cs_knowledge_record.create_time AS createTime , 	cs_knowledge_record.dr AS dr , 	cs_knowledge_record.is_difficult AS isDifficult , 	cs_knowledge_record.create_user_id AS createUserId 	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE 1=1	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM cs_knowledge_record AS cs_knowledge_record
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  knowledge_record_id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="com.hq.courses.entity.CsKnowledgeRecordEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND knowledge_record_id = #{knowledgeRecordId}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="com.hq.courses.entity.CsKnowledgeRecordEntity">
+		select
+		<include refid="base_column"/>
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+        <include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="com.hq.courses.entity.CsKnowledgeRecordEntity" useGeneratedKeys="true" keyProperty="knowledgeId">
+		insert into cs_knowledge_record
+		(
+			`knowledge_id`,`knowledge_name`, `knowledge_no`,`key_point`,`level_id`,`status`,`section_id`,`course_id`, `update_time`, `create_time`,`dr`,`is_difficult`,`create_user_id`
+		)
+		values
+		(
+			#{knowledgeId},#{knowledgeName},#{knowledgeNo},#{keyPoint},#{levelId},#{status},#{sectionId},#{courseId},#{updateTime}, #{createTime},#{dr}, #{isDifficult}, #{createUserId}
+		)
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="com.hq.courses.entity.CsKnowledgeRecordEntity">
+		update cs_knowledge_record 
+		<set>
+			<if test="knowledgeName != null">`knowledge_name` = #{knowledgeName}, </if>
+			<if test="knowledgeNo != null">`knowledge_no` = #{knowledgeNo}, </if>
+			<if test="keyPoint != null">`key_point` = #{keyPoint}, </if>
+			<if test="levelId != null">`level_id` = #{levelId}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="sectionId != null">`section_id` = #{sectionId}, </if>
+			<if test="courseId != null">`course_id` = #{courseId}, </if>
+			<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="dr != null">`dr` = #{dr}, </if>
+			<if test="createUserId != null">`create_user_id` = #{createUserId}, </if>
+			<if test="isDifficult != null">`is_difficult` = #{isDifficult}</if>
+		</set>
+		<include refid="base_where"/>
+		AND knowledge_record_id = #{knowledgeRecordId}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="com.hq.courses.entity.CsKnowledgeRecordEntity">
+		UPDATE cs_knowledge_record 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND knowledge_record_id = #{id}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="com.hq.courses.entity.CsKnowledgeRecordEntity">
+		UPDATE cs_knowledge_record 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND knowledge_record_id IN
+		<foreach item="knowledgeId" collection="ids" open="(" separator="," close=")">
+			#{knowledgeId}
+		</foreach>
+	</update>
+
+    <select id="queryPojoTotal" resultType="int">
+        SELECT
+        COUNT(1)
+        <include refid="base_from"></include>
+        LEFT JOIN cs_course cs_course ON cs_course.course_id = cs_knowledge_record.course_id
+        <include refid="base_where"></include>
+        <if test="courseName != null and courseName.trim() != ''">
+            AND cs_course.course_name LIKE CONCAT('%', #{courseName}, '%')
+        </if>
+        <if test="knowledgeNo != null and knowledgeNo.trim() != ''">
+            AND cs_knowledge_record.knowledge_no = #{knowledgeNo}
+        </if>
+        <if test="knowledgeName != null and knowledgeName.trim() != ''">
+            AND cs_knowledge_record.knowledge_name LIKE CONCAT('%', #{knowledgeName}, '%')
+        </if>
+    </select>
+
+    <select id="queryPojoList" resultType="com.hq.courses.pojo.CsKnowledgeRecordPOJO">
+        SELECT
+            <include refid="base_column"/> ,cs_knowledge_record.create_user_id AS userId,
+            cs_course.course_name,
+            cs_section.section_id,
+            cs_section.section_no,
+            cs_section.section_name
+        <include refid="base_from"></include>
+        LEFT JOIN cs_course cs_course ON cs_course.course_id = cs_knowledge_record.course_id
+        LEFT JOIN cs_section cs_section ON cs_section.section_id = cs_knowledge_record.section_id
+        <include refid="base_where"></include>
+        <if test="courseName != null and courseName.trim() != ''">
+            AND cs_course.course_name LIKE CONCAT('%', #{courseName}, '%')
+        </if>
+        <if test="knowledgeNo != null and knowledgeNo.trim() != ''">
+            AND cs_knowledge_record.knowledge_no = #{knowledgeNo}
+        </if>
+        <if test="knowledgeName != null and knowledgeName.trim() != ''">
+            AND cs_knowledge_record.knowledge_name LIKE CONCAT('%', #{knowledgeName}, '%')
+        </if>
+        ORDER BY cs_knowledge_record.create_time DESC
+    </select>
+</mapper>

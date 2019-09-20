@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>自适应推送商品表</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+            <div class="form-group col-sm-2">
+                <input type="text" class="form-control" v-model.trim="q.goodName" @keyup.enter="query" placeholder="商品名称">
+            </div>
+
+            <a class="btn btn-primary" @click="clearQuery">重置</a>
+
+            <a class="btn btn-primary" @click="query"><i class="fa fa-search"></i>&nbsp;查询</a>
+
+			<a class="btn btn-primary" @click="add"><i class="fa fa-plus"></i>&nbsp;新增</a>
+
+			<a class="btn btn-primary" @click="update"><i class="fa fa-pencil-square-o"></i>&nbsp;修改</a>
+
+            <a class="btn btn-primary" @click="notes"><i class="fa fa-book"></i>&nbsp;说明</a>
+
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+    
+    <div v-show="!showList" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+            <div class="form-group" style="display:none">
+                <div class="col-sm-2 control-label"></div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="adaptiveGoods.id" placeholder=""/>
+			    </div>
+		    </div>
+
+            <div class="form-group">
+                <div class="col-sm-2 control-label">产品线</div>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" v-model.trim="adaptiveGoods.productName" readonly="readonly" placeholder="点击选择产品线" @click="productLayerShow">
+                </div>
+            </div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">商品</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="adaptiveGoods.mallGoodName" @click="selecGoods" placeholder="点击选择商品"/>
+			    </div>
+			</div>
+            <div class="form-group">
+                <div class="col-sm-2 control-label">是否推送卡片</div>
+                <label class="radio-inline">
+                    <input type="radio" id="dr1" name="dr" value="0" v-model.trim="adaptiveGoods.dr"/> 推送
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" id="dr2" name="dr" value="1" v-model.trim="adaptiveGoods.dr"/> 不推送
+                </label>
+            </div>
+            <div class="form-group">
+			   	<div class="col-sm-2 control-label">是否是ios内购商品</div>
+                <label class="radio-inline">
+                    <input type="radio" id="isIapGood2" name="isIapGood" value="1" v-model.trim="adaptiveGoods.isIapGood"/> 是
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" id="isIapGood1" name="isIapGood" value="0" v-model.trim="adaptiveGoods.isIapGood"/> 不是
+                </label>
+			</div>
+
+            <div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/course/adaptivegoods.js?_${date.systemTime}"></script>
+#parse("layer/goodsInfoLay.html")
+#parse("layer/productLay.html")
+</body>
+</html>

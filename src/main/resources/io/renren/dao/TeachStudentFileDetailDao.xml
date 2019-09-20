@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.renren.dao.TeachStudentFileDetailDao">
+    <select id="selectMaterialListByCourseId" resultType="io.renren.entity.TeachStudentFilesDetailEntity">
+        select tsfd.id,tsfd.`name`,tsfd.teach_student_files_id
+        from teach_student_files_detail tsfd
+        JOIN  teach_student_files tsf
+        on tsf.id = tsfd.teach_student_files_id where  tsf.course_id = #{classtypeId}
+
+    </select>
+</mapper>

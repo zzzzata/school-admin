@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.WechatAccountDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	wechat_account.id AS id , 	wechat_account.title AS title , 	wechat_account.appid AS appid , 	wechat_account.app_secret AS appSecret , 	wechat_account.product_id AS productId , 	wechat_account.remark AS remark , 	wechat_account.dr AS dr , 	wechat_account.create_time AS createTime , 	wechat_account.create_user AS createUser 	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE 1=1 AND  dr = 0	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM wechat_account AS wechat_account
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.WechatAccountEntity">
+		select 
+      	<include refid="base_column"/>
+        ,sys_product.product_name
+		<include refid="base_from"/>
+        LEFT JOIN sys_product sys_product ON sys_product.product_id = wechat_account.product_id
+		<include refid="base_where"/>
+		AND id = #{id}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="io.renren.entity.WechatAccountEntity">
+		select
+		<include refid="base_column"/>
+        ,sys_product.product_name,
+        sys_user.nick_name AS createUserName
+		<include refid="base_from"/>
+        LEFT JOIN sys_product sys_product ON sys_product.product_id = wechat_account.product_id
+        LEFT JOIN sys_user sys_user ON sys_user.user_id = wechat_account.create_user
+		<include refid="base_where"/>
+        <if test="title != null and title.trim() != ''">
+            AND wechat_account.title like concat('%',#{title},'%')
+        </if>
+        <if test="appid != null and appid.trim() != ''">
+           AND wechat_account.appid = #{appid}
+        </if>
+        <if test="productId != null and productId > 0">
+           AND wechat_account.product_id = #{productId}
+        </if>
+        <include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/>
+        LEFT JOIN sys_product sys_product ON sys_product.product_id = wechat_account.product_id
+        LEFT JOIN sys_user sys_user ON sys_user.user_id = wechat_account.create_user
+		<include refid="base_where"/>
+        <if test="title != null and title.trim() != ''">
+            AND wechat_account.title like concat('%',#{title},'%')
+        </if>
+        <if test="appid != null and appid.trim() != ''">
+            AND wechat_account.appid = #{appid}
+        </if>
+        <if test="productId != null and productId > 0">
+            AND wechat_account.product_id = #{productId}
+        </if>
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="io.renren.entity.WechatAccountEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into wechat_account
+		(
+			  `title`,`appid`,`app_secret`,`product_id`,`remark`,`dr`,`create_time`,`create_user`
+		)
+		values
+		(
+			#{title},#{appid},#{appSecret},#{productId},#{remark},0,#{createTime},#{createUser}
+		)
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.WechatAccountEntity">
+		update wechat_account 
+		<set>
+			<if test="title != null">`title` = #{title}, </if>
+			<if test="appid != null">`appid` = #{appid}, </if>
+			<if test="appSecret != null">`app_secret` = #{appSecret}, </if>
+			<if test="productId != null">`product_id` = #{productId}, </if>
+			<if test="remark != null">`remark` = #{remark}, </if>
+			<if test="dr != null">`dr` = #{dr}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="createUser != null">`create_user` = #{createUser}</if>
+		</set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="io.renren.entity.WechatAccountEntity">
+        DELETE FROM `wechat_account` WHERE id=#{id}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="io.renren.entity.WechatAccountEntity">
+        DELETE FROM `wechat_account` WHERE id IN
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+</mapper>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.LearningSituationDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	learning_situation.id AS id , 	learning_situation.course_id AS courseId , 	learning_situation.order_id AS orderId , 	learning_situation.user_id AS userId , 	learning_situation.user_plan_id AS userPlanId , 	learning_situation.reference_date AS referenceDate , 	learning_situation.create_date AS createDate , 	learning_situation.full_dur AS fullDur , 	learning_situation.watch_dur AS watchDur , 	learning_situation.attend_per AS attendPer , 	learning_situation.right_num AS rightNum , 	learning_situation.all_num AS allNum , 	learning_situation.job_per AS jobPer , 	learning_situation.teacher_assess AS teacherAssess , 	learning_situation.school_assist AS schoolAssist , 	learning_situation.dr AS dr 	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE learning_situation.dr=0 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM learning_situation AS learning_situation
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.LearningSituationEntity">
+		select
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</select>
+	<!--根据ID查询-->
+	<select id="queryPOJOObject" resultType="io.renren.pojo.LearningSiuationPOJO">
+		SELECT
+		learning_situation.id,
+		learning_situation.reference_date,
+		learning_situation.create_month,
+		learning_situation.attend_per,
+		learning_situation.job_per,
+		learning_situation.teacher_assess,
+		learning_situation.school_assist,
+		courses.course_name,
+		course_classplan.classplan_name
+		FROM
+		`learning_situation` learning_situation
+		LEFT JOIN courses courses ON learning_situation.course_id = courses.course_id
+		LEFT JOIN course_classplan course_classplan ON learning_situation.classplan_id = course_classplan.classplan_id
+		where learning_situation.id = #{id} and  learning_situation.dr = 0
+	</select>
+	<!--分页列表-->
+	<select id="queryPOJOList" resultType="io.renren.pojo.LearningSiuationPOJO">
+		SELECT
+		record_sign.record_sign_id,
+		record_sign.nc_id,
+		learning_situation.id,
+		learning_situation.reference_date,
+		learning_situation.create_month,
+		learning_situation.attend_per,
+		learning_situation.job_per,
+		learning_situation.teacher_assess,
+		learning_situation.school_assist,
+		courses.course_name,
+		course_classplan.classplan_name
+		FROM
+		`learning_situation` learning_situation
+		LEFT JOIN record_sign record_sign ON learning_situation.order_id = record_sign.order_id
+		LEFT JOIN courses courses ON learning_situation.course_id = courses.course_id
+		LEFT JOIN course_classplan course_classplan ON learning_situation.classplan_id = course_classplan.classplan_id
+		LEFT JOIN course_abnormal_registration course_abnormal_registration ON (
+		learning_situation.course_id = course_abnormal_registration.course_id
+		AND learning_situation.user_plan_id = course_abnormal_registration.user_plan_id
+		)
+		where  record_sign.record_sign_id = #{recordSignId}
+		<if test="createMonth != null">
+			and learning_situation.create_month = #{createMonth}
+		</if>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryPOJOTotal" resultType="int">
+		select count(1)
+		FROM
+		`learning_situation` learning_situation
+		LEFT JOIN record_sign record_sign ON learning_situation.order_id = record_sign.order_id
+		LEFT JOIN course_abnormal_registration course_abnormal_registration ON (
+		learning_situation.course_id = course_abnormal_registration.course_id
+		AND learning_situation.user_plan_id = course_abnormal_registration.user_plan_id
+		)
+		where  record_sign.record_sign_id = #{recordSignId}
+		<if test="createMonth != null">
+		and learning_situation.create_month = #{createMonth}
+	</if>
+	</select>
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.LearningSituationEntity">
+		update learning_situation 
+		<set>
+			<if test="referenceDate != null">`reference_date` = #{referenceDate}, </if>
+			<if test="teacherAssess != null">`teacher_assess` = #{teacherAssess}, </if>
+			<if test="schoolAssist != null">`school_assist` = #{schoolAssist}, </if>
+		</set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+</mapper>

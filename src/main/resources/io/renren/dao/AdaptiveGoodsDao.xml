@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.AdaptiveGoodsDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	adaptive_goods.id AS id , 	adaptive_goods.mall_good_id AS mallGoodId , 	adaptive_goods.mall_good_name AS mallGoodName ,
+		adaptive_goods.is_iap_good AS isIapGood , 	adaptive_goods.dr AS dr, adaptive_goods.product_id AS productId	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE 1=1 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM adaptive_goods AS adaptive_goods
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.AdaptiveGoodsEntity">
+		select 
+      	<include refid="base_column"/>
+        ,sys_product.product_name
+		<include refid="base_from"/>
+        LEFT JOIN sys_product sys_product ON sys_product.product_id = adaptive_goods.product_id
+		<include refid="base_where"/>
+		AND id = #{id}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="io.renren.entity.AdaptiveGoodsEntity">
+		select
+		<include refid="base_column"/>
+        ,sys_product.product_name
+		<include refid="base_from"/>
+        LEFT JOIN sys_product sys_product ON sys_product.product_id = adaptive_goods.product_id
+		<include refid="base_where"/>
+        <if test="goodName != null and goodName.trim() != ''">
+            AND mall_good_name LIKE concat('%',#{goodName},'%')
+        </if>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/>
+        LEFT JOIN sys_product sys_product ON sys_product.product_id = adaptive_goods.product_id
+		<include refid="base_where"/>
+        <if test="goodName != null and goodName.trim() != ''">
+            AND mall_good_name LIKE concat('%',#{goodName},'%')
+        </if>
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="io.renren.entity.AdaptiveGoodsEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into adaptive_goods
+		(
+			  `mall_good_id`, `mall_good_name`, `is_iap_good`, `dr`, `product_id`)
+		values
+		(
+			#{mallGoodId}, #{mallGoodName},#{isIapGood},0,#{productId})
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.AdaptiveGoodsEntity">
+		update adaptive_goods 
+		<set>
+			<if test="mallGoodId != null">`mall_good_id` = #{mallGoodId}, </if>
+			<if test="mallGoodName != null">`mall_good_name` = #{mallGoodName}, </if>
+			<if test="isIapGood != null">`is_iap_good` = #{isIapGood}, </if>
+			<if test="productId != null">`product_id` = #{productId}, </if>
+			<if test="dr != null">`dr` = #{dr}</if>
+		</set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="io.renren.entity.AdaptiveGoodsEntity">
+		UPDATE adaptive_goods 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="io.renren.entity.AdaptiveGoodsEntity">
+		UPDATE adaptive_goods 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id IN 
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+</mapper>

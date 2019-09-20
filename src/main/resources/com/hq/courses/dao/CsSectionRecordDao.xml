@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hq.courses.dao.CsSectionRecordDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	cs_section_record.section_record_id AS sectionRecordId ,cs_section_record.section_id AS sectionId , 	cs_section_record.section_name AS sectionName , 	cs_section_record.section_no AS sectionNo , 	cs_section_record.course_id AS courseId ,
+	cs_section_record.update_time AS updateTime , 	cs_section_record.create_time AS createTime ,
+	cs_section_record.dr AS dr , 	cs_section_record.order_num AS orderNum , 	cs_section_record.chapter_id AS chapterId, 	cs_section_record.create_user_id AS createUserId 	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE 1=1 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM cs_section_record AS cs_section_record
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  section_record_id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="com.hq.courses.entity.CsSectionRecordEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND section_record_id = #{sectionRecordId}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="com.hq.courses.entity.CsSectionRecordEntity">
+		select
+		<include refid="base_column"/>
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+        <include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="com.hq.courses.entity.CsSectionRecordEntity" useGeneratedKeys="true" keyProperty="sectionRecordId">
+		insert into cs_section_record
+		(
+				`section_id`,`section_name`,`section_no`,`course_id`,`update_time`,`create_time`,`dr`,`order_num`, `chapter_id`, `create_user_id`
+		)
+		values
+		(
+			#{sectionId},#{sectionName},#{sectionNo},#{courseId},#{updateTime}, #{createTime},#{dr},#{orderNum},#{chapterId},#{createUserId}
+		)
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="com.hq.courses.entity.CsSectionRecordEntity">
+		update cs_section_record 
+		<set>
+			<if test="sectionName != null">`section_name` = #{sectionName}, </if>
+			<if test="sectionNo != null">`section_no` = #{sectionNo}, </if>
+			<if test="courseId != null">`course_id` = #{courseId}, </if>
+			<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="dr != null">`dr` = #{dr}, </if>
+			<if test="orderNum != null">`order_num` = #{orderNum}, </if>
+			<if test="createUserId != null">`create_user_id` = #{createUserId}, </if>
+			<if test="chapterId != null">`chapter_id` = #{chapterId}</if>
+		</set>
+		<include refid="base_where"/>
+		AND section_record_id = #{sectionRecordId}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="com.hq.courses.entity.CsSectionRecordEntity">
+		UPDATE cs_section_record 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND section_record_id = #{id}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="com.hq.courses.entity.CsSectionRecordEntity">
+		UPDATE cs_section_record 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND section_record_id IN
+		<foreach item="sectionId" collection="ids" open="(" separator="," close=")">
+			#{sectionId}
+		</foreach>
+	</update>
+
+    <select id="queryPojoTotal" resultType="int">
+        SELECT
+          COUNT(1)
+        <include refid="base_from"></include>
+        LEFT JOIN cs_course cs_course ON cs_course.course_id = cs_section_record.course_id
+        <include refid="base_where"></include>
+        <if test="courseName != null and courseName.trim() != ''">
+            AND cs_course.course_name LIKE CONCAT('%', #{courseName}, '%')
+        </if>
+        <if test="sectionNo != null and sectionNo.trim() != ''">
+            AND cs_section_record.section_no = #{sectionNo}
+        </if>
+        <if test="sectionName != null and sectionName.trim() != ''">
+            AND cs_section_record.section_name LIKE CONCAT('%', #{sectionName}, '%')
+        </if>
+    </select>
+
+    <select id="queryPojoList" resultType="com.hq.courses.pojo.CsSectionRecordPOJO">
+        SELECT
+        <include refid="base_column"/> ,cs_section_record.create_user_id AS userId,cs_course.course_name
+        <include refid="base_from"></include>
+        LEFT JOIN cs_course cs_course ON cs_course.course_id = cs_section_record.course_id
+        <include refid="base_where"></include>
+        <if test="courseName != null and courseName.trim() != ''">
+            AND cs_course.course_name LIKE CONCAT('%', #{courseName}, '%')
+        </if>
+        <if test="sectionNo != null and sectionNo.trim() != ''">
+            AND cs_section_record.section_no = #{sectionNo}
+        </if>
+        <if test="sectionName != null and sectionName.trim() != ''">
+            AND cs_section_record.section_name LIKE CONCAT('%', #{sectionName}, '%')
+        </if>
+        ORDER BY cs_section_record.create_time DESC
+    </select>
+</mapper>

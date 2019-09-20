@@ -1,0 +1,38 @@
+<div id="insuranceInfoLayDiv" style="display: none">
+<!--根据学费和金额取得相应的单 -->
+<table  border="0">
+	<tr class="row" >
+	<td class=""><label for="insuranceInfoId">id：</label></td>
+		<td >
+			<input type="text" class="form-control" id="insuranceInfoId" placeholder="ID">
+			
+		</td>
+		<td class=""><label for="productCode">誉好产品编码：</label></td>
+		<td >
+			<input type="text" class="form-control" id="productCode" placeholder="誉好产品编码">
+		</td>
+		</tr>
+		
+		
+		<tr class="row" >
+		<td class=""><label for="tuitionFee">学费：</label></td>
+		<td >
+			<input type="text" class="form-control" id="tuitionFee" placeholder="学费">
+		</td>
+		<td class=""><label for="premium">投保金额：</label></td>
+		<td >
+			<input type="text" class="form-control" id="premium" placeholder="投保金额">
+		</td>
+		
+		
+		</tr><tr class="row" >
+		<!-- 按钮 -->
+		<td class="grid-btn">
+			<a class="btn btn-default" onclick="insuranceInfoLay.reload();">查询</a> 
+		</td>
+	</tr>
+</table>
+<table id="insuranceInfoLay_jqGrid" ></table>
+<table id="insuranceInfoLay_jqGridPager" ></table>
+</div>
+<script src="${rc.contextPath}/js/layer/insuranceInfoLay.js?_${date.systemTime}"></script>

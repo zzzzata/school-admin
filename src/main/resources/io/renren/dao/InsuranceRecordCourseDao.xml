@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.InsuranceRecordCourseDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	 s.id as id,
+s.insurance_record_id as insuranceRecordId,
+s.user_id as userId,
+s.subject_infos as subjectInfos,
+s.subject_code as subjectCode,
+s.subject_name as subjectName,
+s.subject_hour as subjectHour,
+s.exam_date as examDate,
+s.dr as dr,
+s.ts as ts,
+s.creation_time as creationTime 
+
+
+	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	where dr=0 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 from insurance_record_course s
+	</sql>
+	
+	
+	<sql id="base_query">
+		 <if test='id != null'> and `id` = #{id}  </if>
+<if test='insuranceRecordId != null'> and `insurance_record_id` = #{insuranceRecordId} </if>
+<if test='userId != null'>and `user_id` = #{userId}  </if>
+<if test='subjectInfos != null'>and `subject_infos` = #{subjectInfos}  </if>
+<if test='subjectCode != null'>and `subject_code` = #{subjectCode}  </if>
+<if test='subjectName != null'>and `subject_name` = #{subjectName}  </if>
+<if test='subjectHour != null'>and `subject_hour` = #{subjectHour}  </if>
+<if test='examDate != null'>and `exam_date` = #{examDate}  </if>
+<if test='dr != null'>and `dr` = #{dr}  </if> 
+	
+	</sql>
+	
+	
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.InsuranceRecordCourseEntity">
+		select 
+      	<include refid="base_column"/> 
+      	<include refid="base_from"/> 
+		<include refid="base_where"/>
+		AND id = #{id}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="io.renren.entity.InsuranceRecordCourseEntity">
+	
+	 		select
+		<include refid="base_column" />
+		<include refid="base_from" />
+
+		<include refid="base_where" />
+		<include refid="base_query" />
+
+
+		order by s.id desc
+		<if test="offset != null and limit != null  ">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(0)
+		<include refid="base_from" />
+
+		<include refid="base_where" />
+
+		<include refid="base_query" />
+
+	</select>
+
+	<select id="queryGooodsCourse" resultType="io.renren.entity.InsuranceRecordCourseEntity">
+		select courses.course_id subjectCode,courses.course_name subjectName,
+		gd.subject_hour subjectHour,gd.dr
+		from mall_goods_info info
+		left join mall_goods_details gd on info.id=gd.mall_goods_id
+		left join courses courses on gd.course_id=courses.course_id
+		where courses.is_offic=1 and info.dr=0 and gd.dr=0  	and gd.dr=0	and  gd.insurance_course_status=1
+
+		<if test='goodsId != null'> and info.id = #{goodsId}  </if>
+
+		<if test='insuranceInfoId != null'> and info.insurance_info_id = #{insuranceInfoId}  </if>
+		<if test='areaId != null'> and gd.mall_area_id = #{areaId}  </if>
+	</select> 
+	
+		<select id="countGooodsCourseByArea" resultType="map">
+	select
+	insu.insurance_type,info.insurance_info_id,info.name,area.area_name areaName,gd.mall_area_id areaId,sum(gd.insurance_course_status)  rs
+	from mall_goods_info info
+	left join mall_goods_details gd on
+	info.id=gd.mall_goods_id
+	left join courses courses on
+	gd.course_id=courses.course_id
+	left join mall_area area on
+	gd.mall_area_id=area.area_id
+	left join insurance_info insu on
+	info.insurance_info_id=insu.insurance_info_id
+	where courses.is_offic=1	and info.dr=0 and gd.dr=0  
+	<if test='goodsId != null'> and info.id = #{goodsId}  </if>
+	<if test='insuranceInfoId != null'> and info.insurance_info_id = #{insuranceInfoId}  </if>
+	<if test='areaId != null'> and gd.mall_area_id = #{areaId}  </if>
+
+	group by info.name,gd.mall_area_id
+</select> 
+	
+	
+	
+	
+	
+	
+	<!--新增-->
+	<insert id="save" parameterType="io.renren.entity.InsuranceRecordCourseEntity" useGeneratedKeys="true" keyProperty="id">
+	insert into insurance_record_course
+	( 
+`id`,
+`insurance_record_id`,
+`user_id`,
+`subject_infos`,
+`subject_code`,
+`subject_name`,
+`subject_hour`,
+`exam_date`,
+`dr`,
+`ts`,
+`creation_time`
+
+
+	)
+	values
+	(
+#{id},
+#{insuranceRecordId},
+#{userId},
+#{subjectInfos},
+#{subjectCode},
+#{subjectName},
+#{subjectHour},
+#{examDate},
+#{dr},
+#{ts},
+#{creationTime}
+
+	)
+
+
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.InsuranceRecordCourseEntity">
+		update insurance_record_course 
+		<set> 
+		 <if test='id != null'>`id` = #{id}, </if>
+<if test='insuranceRecordId != null'>`insurance_record_id` = #{insuranceRecordId}, </if>
+<if test='userId != null'>`user_id` = #{userId}, </if>
+<if test='subjectInfos != null'>`subject_infos` = #{subjectInfos}, </if>
+<if test='subjectCode != null'>`subject_code` = #{subjectCode}, </if>
+<if test='subjectName != null'>`subject_name` = #{subjectName}, </if>
+<if test='subjectHour != null'>`subject_hour` = #{subjectHour}, </if>
+<if test='examDate != null'>`exam_date` = #{examDate}, </if>
+
+<if test='dr != null'>`dr` = #{dr}, </if>
+<if test='ts != null'>`ts` = #{ts}, </if>
+<if test='creationTime != null'>`creation_time` = #{creationTime}  </if>
+		 
+		</set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+	
+	<update id="updateDrByinsuranceRecordId"  >
+		update insurance_record_course  set dr=1 where insurance_record_id= #{insuranceRecordId}
+	</update>
+	
+	
+	
+	
+	<!--删除-->
+	<delete id="delete">
+		DELETE FROM insurance_record_course 
+		where dr=0 
+		AND id = #{id}
+	</delete>
+	
+	<!--批量删除-->
+	<delete id="deleteBatch">
+		DELETE FROM insurance_record_course  where dr=0 
+		AND id IN 
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	 
+	 
+	 
+	 
+	 
+	 
+	 
+</mapper>

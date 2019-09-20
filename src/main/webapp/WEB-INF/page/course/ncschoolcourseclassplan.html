@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>NC线下排课信息表</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+    <div class="grid-btn">
+        <table class="table table-condensed" border="0">
+            <tr border="0">
+                <td><label for="name">排课计划名称</label></td>
+                <td><input type="text" class="form-control" v-model.trim="q.classplanName" @keyup.enter="query" placeholder="排课计划名称"></td>
+                <td><label for="name">课程名称</label></td>
+                <td><input type="text" class="form-control" v-model.trim="q.courseName" @keyup.enter="query" placeholder="课程名称"></td>
+                <td><label for="name">所属校区</label></td>
+                <td><input type="text" class="form-control" v-model.trim="q.schoolName" @keyup.enter="query" placeholder="校区名称"></td>
+                <td><label for="name">授课老师</label></td>
+                <td><input type="text" class="form-control" v-model.trim="q.courseTeacherName" @keyup.enter="query" placeholder="课程名称"></td>
+                <td><label for="name">开课日期</label></td>
+                <td nowrap="nowrap" colspan=2>
+                    <input type="text" class="datetimepicker_start" id="StartTime" readonly="readonly" v-model="q.startTime" @keyup.enter="query" placeholder="开始时间">
+                    -
+                    <input type="text" class="datetimepicker_end" id="EndTime" readonly="readonly" v-model="q.endTime" @keyup.enter="query" placeholder="结束时间">
+                </td>
+            </tr>
+        </table>
+        <a class="btn btn-primary" @click="clearQuery"><i class='fa fa-search'></i>&nbsp;重置</a>
+
+        <a class="btn btn-primary" @click="query"><i class='fa fa-search'></i>&nbsp;查询</a>
+
+        <a class="btn btn-primary" @click="look"><i class="fa fa-plus"></i>&nbsp;查看</a>
+
+        <a class="btn btn-primary" @click="userList"><i class="fa fa-pencil-square-o"></i>&nbsp;学员列表</a>
+
+        <a class="btn btn-danger" onclick="hq.ui.exportData(null);" style="float: right;">导出</a>
+
+        <!--<a class="btn btn-primary" @click="resume"><i class="fa fa-play"></i>&nbsp;恢复</a>
+
+        <a class="btn btn-primary" @click="pause"><i class="fa fa-pause"></i>&nbsp;暂停</a>-->
+
+    </div>
+    <table id="jqGrid"></table>
+    <div id="jqGridPager"></div>
+</div>
+
+
+    <div v-show="showDetailList">
+        <div class="panel-heading">{{title}}</div>
+        <table id="jqGridDetail"></table>
+        <div id="jqGridPagerDetail"></div>
+        <a class="btn btn-warning" @click="goList">返回</a>
+    </div>
+    
+    <div v-show="showSaveOrUpdate" class="panel panel-default">
+		<div class="panel-heading">{{title}}</div>
+		<form class="form-horizontal">
+						<div class="form-group" style="display:none">
+			   	<div class="col-sm-2 control-label"></div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.id" placeholder=""/>
+			    </div>
+		</div>
+								    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc排课id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.courseclassplanId" placeholder="nc排课id"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc排课名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.courseclassplanName" placeholder="nc排课名称"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc排课编码</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.courseclassplanCode" placeholder="nc排课编码"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc班级id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.ncClassId" placeholder="nc班级id"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc班级名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.ncClassName" placeholder="nc班级名称"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc校区id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.ncSchoolId" placeholder="nc校区id"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc校区名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.ncSchoolName" placeholder="nc校区名称"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc课程id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.courseId" placeholder="nc课程id"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc课城名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.courseName" placeholder="nc课城名称"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc上课时点(上午下午晚上)</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.scheduleTime" placeholder="nc上课时点(上午下午晚上)"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc排课类型(正常排课,加课)</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.classplanType" placeholder="nc排课类型(正常排课,加课)"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc排课开课日期</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.dateTime" placeholder="nc排课开课日期"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc授课老师用户编码</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.courseTeacherUsercode" placeholder="nc授课老师用户编码"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">授课老师id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.courseTeacherId" placeholder="授课老师id"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc授课老师名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.courseTeacherName" placeholder="nc授课老师名称"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc考核老师用户编码</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.auditTeacherUsercode" placeholder="nc考核老师用户编码"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc考核老师id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.auditTeacherId" placeholder="nc考核老师id"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc考核老师名称</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.auditTeacherName" placeholder="nc考核老师名称"/>
+			    </div>
+			</div>
+											    		    								    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">创建时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.createTime" placeholder="创建时间"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">修改时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.modifiedTime" placeholder="修改时间"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">是否删除标志: 0有效 1删除</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.dr" placeholder="是否删除标志: 0有效 1删除"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">nc修改排课数据时间</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.ncModifiedTime" placeholder="nc修改排课数据时间"/>
+			    </div>
+			</div>
+											    			<div class="form-group">
+			   	<div class="col-sm-2 control-label">产品线id</div>
+			   	<div class="col-sm-10">
+			      <input type="text" class="form-control" v-model="ncSchoolCourseclassplan.productId" placeholder="产品线id"/>
+			    </div>
+			</div>
+										<div class="form-group">
+				<div class="col-sm-2 control-label"></div> 
+				<input type="button" class="btn btn-primary" @click="saveOrUpdate" value="确定"/>
+				&nbsp;&nbsp;<input type="button" class="btn btn-warning" @click="reload" value="返回"/>
+			</div>
+		</form>
+	</div>
+</div>
+
+<script src="${rc.contextPath}/js/course/ncschoolcourseclassplan.js?_${date.systemTime}"></script>
+#parse("layer/ncUsersByclassplanLay.html")
+</body>
+</html>

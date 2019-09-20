@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.ReturnVisitDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	return_visit.id AS id , return_visit.create_person AS createPerson , 	return_visit.expect_time AS expectTime , 	return_visit.return_time AS returnTime , 	return_visit.return_status AS returnStatus , 	return_visit.return_content AS returnContent , 	return_visit.record_sign_id AS recordSignId , 	return_visit.dr AS dr 	</sql>
+	<!-- 通用查询表头 -->
+	<sql id="pojo_column">
+	return_visit.id AS id , 	return_visit.expect_time  AS expectTime , 	return_visit.return_time  AS returnTime , 	return_visit.return_status AS returnStatus , 	return_visit.return_content AS returnContent , 	return_visit.record_sign_id AS recordSignId , 	return_visit.dr AS dr
+	,sys_user.nick_name as createPersonName,users.mobile
+	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE  return_visit.dr=0 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM return_visit AS return_visit
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  id asc
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.ReturnVisitEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="io.renren.entity.ReturnVisitEntity">
+		select
+		<include refid="base_column"/>
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+		and record_sign_id = #{recordSignId}
+		<include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+		and record_sign_id = #{recordSignId}
+	</select>
+	<!--根据ID查询-->
+	<select id="queryPOJOObject" resultType="io.renren.pojo.ReturnVisitPOJO">
+		select
+		<include refid="pojo_column"/>
+		<include refid="base_from"/>
+		left join sys_user as sys_user on return_visit.create_person = sys_user.user_id
+		left join users on return_visit.user_id = users.user_id
+		<include refid="base_where"/>
+		AND id = #{id}
+	</select>
+
+	<!--分页列表-->
+	<select id="queryPOJOList" resultType="io.renren.pojo.ReturnVisitPOJO">
+		select
+		<include refid="pojo_column"/>
+		<include refid="base_from"/>
+		left join sys_user as sys_user on return_visit.create_person = sys_user.user_id
+		left join users on return_visit.user_id = users.user_id
+		<include refid="base_where"/>
+		and record_sign_id = #{recordSignId}
+		<include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="queryLast" resultType="java.lang.Long">
+select id from return_visit WHERE record_sign_id =#{recordSignId}  and dr=0   and expect_time is not null ORDER BY expect_time  desc LIMIT 1
+
+	</select>
+	<!--查询该学员是否已联系-->
+	<select id="checkIsContact" resultType="java.lang.Integer">
+		select follow_status follow_status  from record_sign where record_sign_id = #{recordSignId}
+
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="io.renren.entity.ReturnVisitEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into return_visit
+		(
+				`create_person`, `expect_time`, 	`return_time`, 			`return_status`, `return_content`, `record_sign_id`, 				`dr`		,`user_id`)
+		values
+		(
+				#{createPerson}, #{expectTime},  #{returnTime}, 				#{returnStatus}, 	#{returnContent}, 			#{recordSignId}, 				0			,#{userId})
+	</insert>
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.ReturnVisitEntity">
+		update return_visit 
+		<set>
+			<if test="createPerson != null">`create_person` = #{createPerson}, </if>
+			<if test="returnTime != null">`return_time` = #{returnTime}, </if>
+			<if test="returnStatus != null">`return_status` = #{returnStatus}, </if>
+			<if test="returnContent != null">`return_content` = #{returnContent}, </if>
+		</set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="io.renren.entity.ReturnVisitEntity">
+		UPDATE return_visit 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND record_sign_id = #{recordSignId}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="io.renren.entity.ReturnVisitEntity">
+		UPDATE return_visit 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id IN 
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+</mapper>

@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.NcSchoolCourseclassplanDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	nc_school_courseclassplan.id AS id , 	nc_school_courseclassplan.courseclassplan_id AS courseclassplanId , 	nc_school_courseclassplan.courseclassplan_name AS courseclassplanName , 	nc_school_courseclassplan.nc_school_id AS ncSchoolId , 	nc_school_courseclassplan.nc_school_name AS ncSchoolName , 	nc_school_courseclassplan.course_id AS courseId , 	nc_school_courseclassplan.course_name AS courseName , 	nc_school_courseclassplan.schedule_time AS scheduleTime , 	nc_school_courseclassplan.classplan_type AS classplanType , 	nc_school_courseclassplan.date_time AS dateTime , 	nc_school_courseclassplan.course_teacher_id AS courseTeacherId , 	nc_school_courseclassplan.course_teacher_name AS courseTeacherName ,
+	nc_school_courseclassplan.audit_teacher_id AS auditTeacherId , 	nc_school_courseclassplan.audit_teacher_name AS auditTeacherName , 	nc_school_courseclassplan.status AS status , 	nc_school_courseclassplan.create_time AS createTime , 	nc_school_courseclassplan.modified_time AS modifiedTime , 	nc_school_courseclassplan.dr AS dr , nc_school_courseclassplan.dept_id AS deptId ,	nc_school_courseclassplan.nc_modified_time AS ncModifiedTime,nc_school_courseclassplan.course_code AS courseCode,nc_school_courseclassplan.course_fk AS  courseFk	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE 1 = 1 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM nc_school_courseclassplan AS nc_school_courseclassplan
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  nc_school_courseclassplan.id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.NcSchoolCourseclassplanEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="io.renren.entity.NcSchoolCourseclassplanEntity">
+		select
+		<include refid="base_column"/>
+        ,sys_product.product_name,
+        (SELECT COUNT(1) FROM nc_school_courseclassplan_live WHERE courseclassplan_id = nc_school_courseclassplan.courseclassplan_id AND dr = 0) AS classplanLiveNum,
+        (SELECT
+        COUNT(1)
+        FROM
+        nc_school_learning_detail detail LEFT JOIN nc_school_learning learning ON learning.learning_id = detail.learning_id
+        WHERE
+        detail.courseclassplan_id = nc_school_courseclassplan.courseclassplan_id
+        AND detail.dr = 0
+        AND learning.dr = 0) AS studentNum
+		<include refid="base_from"/>
+        LEFT JOIN sys_product sys_product ON sys_product.product_id = nc_school_courseclassplan.product_id
+		<include refid="base_where"/>
+        <if test="classplanName != null and classplanName.trim() != ''">
+            AND courseclassplan_name LIKE concat('%',#{classplanName},'%')
+        </if>
+        <if test="courseName != null and courseName.trim() != ''">
+            AND course_name LIKE concat('%',#{courseName},'%')
+        </if>
+        <if test="schoolName != null and schoolName.trim() != ''">
+            AND nc_school_name LIKE concat('%',#{schoolName},'%')
+        </if>
+        <if test="courseTeacherName != null and courseTeacherName.trim() != ''">
+            AND course_teacher_name LIKE concat('%',#{courseTeacherName},'%')
+        </if>
+        <if test="startTime != null and startTime != ''">
+            AND date_time > #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND date_time &lt; #{endTime}
+        </if>
+        <include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+        <if test="classplanName != null and classplanName.trim() != ''">
+            AND courseclassplan_name LIKE concat('%',#{classplanName},'%')
+        </if>
+        <if test="courseName != null and courseName.trim() != ''">
+            AND course_name LIKE concat('%',#{courseName},'%')
+        </if>
+        <if test="schoolName != null and schoolName.trim() != ''">
+            AND nc_school_name LIKE concat('%',#{schoolName},'%')
+        </if>
+        <if test="courseTeacherName != null and courseTeacherName.trim() != ''">
+            AND course_teacher_name LIKE concat('%',#{courseTeacherName},'%')
+        </if>
+        <if test="starTime != null and starTime != ''">
+            AND date_time > #{startTime}
+        </if>
+        <if test="endTime != null and endTime != ''">
+            AND date_time &lt; #{endTime}
+        </if>
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="io.renren.entity.NcSchoolCourseclassplanEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into nc_school_courseclassplan
+		(`courseclassplan_id`,`courseclassplan_name`,`courseclassplan_code`,`nc_class_id`,`nc_class_name`,`nc_school_id`,`nc_school_name`,`course_id`,`course_name`,`schedule_time`,`classplan_type`, `date_time`,`course_teacher_usercode`,`course_teacher_id`,`course_teacher_name`,`audit_teacher_usercode`,`audit_teacher_id`,`audit_teacher_name`,`status`,`create_time`,`modified_time`,`dr`,`nc_modified_time`,`product_id`,`dept_id`,`course_code`,`course_fk`
+		)
+		values
+		(
+		#{courseclassplanId},#{courseclassplanName},#{courseclassplanCode},#{ncClassId},#{ncClassName},#{ncSchoolId},#{ncSchoolName},#{courseId},#{courseName},#{scheduleTime},#{classplanType},#{dateTime},#{courseTeacherUsercode},#{courseTeacherId},#{courseTeacherName},#{auditTeacherUsercode},#{auditTeacherId},#{auditTeacherName},#{status},#{createTime},#{modifiedTime},#{dr},#{ncModifiedTime},#{productId},#{deptId},#{courseCode},#{courseFk})
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.NcSchoolCourseclassplanEntity">
+		update nc_school_courseclassplan 
+		<set>
+			<if test="courseclassplanId != null">`courseclassplan_id` = #{courseclassplanId}, </if>
+			<if test="courseclassplanName != null">`courseclassplan_name` = #{courseclassplanName}, </if>
+			<if test="courseclassplanCode != null">`courseclassplan_code` = #{courseclassplanCode}, </if>
+			<if test="ncClassId != null">`nc_class_id` = #{ncClassId}, </if>
+			<if test="ncClassName != null">`nc_class_name` = #{ncClassName}, </if>
+			<if test="ncSchoolId != null">`nc_school_id` = #{ncSchoolId}, </if>
+			<if test="ncSchoolName != null">`nc_school_name` = #{ncSchoolName}, </if>
+			<if test="courseId != null">`course_id` = #{courseId}, </if>
+			<if test="courseName != null">`course_name` = #{courseName}, </if>
+			<if test="courseCode != null">`course_code` = #{courseCode}, </if>
+			<if test="courseFk != null">`course_fk` = #{courseFk}, </if>
+			<if test="scheduleTime != null">`schedule_time` = #{scheduleTime}, </if>
+			<if test="classplanType != null">`classplan_type` = #{classplanType}, </if>
+			<if test="dateTime != null">`date_time` = #{dateTime}, </if>
+			<if test="courseTeacherId != null">`course_teacher_id` = #{courseTeacherId}, </if>
+			<if test="courseTeacherUsercode != null">`course_teacher_usercode` = #{courseTeacherUsercode}, </if>
+			<if test="auditTeacherUsercode != null">`audit_teacher_usercode` = #{auditTeacherUsercode}, </if>
+			<if test="courseTeacherName != null">`course_teacher_name` = #{courseTeacherName}, </if>
+			<if test="auditTeacherId != null">`audit_teacher_id` = #{auditTeacherId}, </if>
+			<if test="auditTeacherName != null">`audit_teacher_name` = #{auditTeacherName}, </if>
+			<if test="status != null">`status` = #{status}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="modifiedTime != null">`modified_time` = #{modifiedTime}, </if>
+			<if test="dr != null">`dr` = #{dr}, </if>
+			<if test="productId != null">`product_id` = #{productId}, </if>
+			<if test="deptId != null">`dept_id` = #{deptId}, </if>
+			<if test="ncModifiedTime != null">`nc_modified_time` = #{ncModifiedTime}</if>
+		</set>
+		<include refid="base_where"/>
+		AND courseclassplan_id = #{courseclassplanId}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="io.renren.entity.NcSchoolCourseclassplanEntity">
+		UPDATE nc_school_courseclassplan 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id = #{id}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="io.renren.entity.NcSchoolCourseclassplanEntity">
+		UPDATE nc_school_courseclassplan 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND id IN 
+		<foreach item="id" collection="ids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+
+    <select id="isExistByClassplanId" resultType="int">
+        SELECT
+        COUNT(1)
+        FROM
+        `nc_school_courseclassplan`
+        WHERE
+        courseclassplan_id = #{courseclassplanId}
+        <if test="ncModifiedTime != null">
+            AND nc_modified_time &lt; #{ncModifiedTime}
+        </if>
+    </select>
+    
+    
+    <select id="queryDetailList" resultType="io.renren.entity.NcSchoolCourseclassplanLiveEntity">
+        SELECT
+            *
+        FROM
+            `nc_school_courseclassplan_live`
+        WHERE
+            courseclassplan_id = #{classplanId}
+        AND dr = 0;
+    </select>
+
+    <select id="queryDetailTotal" resultType="int">
+        SELECT
+            count(1)
+        FROM
+            `nc_school_courseclassplan_live`
+        WHERE
+            courseclassplan_id = #{classplanId}
+        AND dr = 0;
+    </select>
+
+    <select id="queryUserList" resultType="io.renren.pojo.NcUserListPOJO">
+        SELECT
+            `nc_school_learning_detail`.mobile,
+            `nc_school_learning_detail`.time_stamp,
+            nc_school_learning.learning_no,
+            nc_school_learning.nc_class_type,
+            nc_school_learning.user_name as userName
+        FROM
+            `nc_school_learning_detail` `nc_school_learning_detail`,
+            nc_school_learning nc_school_learning
+        WHERE
+            nc_school_learning.learning_id = nc_school_learning_detail.learning_id
+        AND  nc_school_learning.dr=0
+        AND  nc_school_learning_detail.dr=0
+        AND `nc_school_learning_detail`.courseclassplan_id = #{classplanId}
+        <if test="userName != null and userName.trim() != ''">
+            AND nc_school_learning.user_name LIKE concat('%',#{userName},'%')
+        </if>
+        <if test="mobile != null and mobile.trim() != ''">
+            AND nc_school_learning_detail.mobile =#{mobile}
+        </if>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+    </select>
+    <select id="queryUserListTotal" resultType="int">
+        SELECT
+          count(1)
+        FROM
+            `nc_school_learning_detail` `nc_school_learning_detail`,
+            nc_school_learning nc_school_learning
+
+        WHERE
+            nc_school_learning.learning_id = nc_school_learning_detail.learning_id
+        AND  nc_school_learning.dr=0
+        AND  nc_school_learning_detail.dr=0
+        AND `nc_school_learning_detail`.courseclassplan_id = #{classplanId}
+        <if test="userName != null and userName.trim() != ''">
+            AND nc_school_learning.user_name LIKE concat('%',#{userName},'%')
+        </if>
+        <if test="mobile != null and mobile.trim() != ''">
+            AND nc_school_learning_detail.mobile =#{mobile}
+        </if>
+    </select>
+</mapper>

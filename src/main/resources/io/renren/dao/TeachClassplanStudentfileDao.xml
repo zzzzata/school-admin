@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="io.renren.dao.TeachClassplanStudentfileDao">
+    <insert id="save" parameterType="io.renren.entity.TeachClassplanStudentfileEntity" useGeneratedKeys="true" >
+        insert into teach_classplan_studentfile (id,classplan_id,teach_student_file_id,sys_user_id)
+        values (#{id},#{classplanId},#{teachStudentFileId},#{sysUserId})
+    </insert>
+    <delete id="delect" parameterType="io.renren.entity.TeachClassplanStudentfileEntity">
+        delete from teach_classplan_studentfile where classplan_id = #{classplanId}
+    </delete>
+    <select id="get" resultType="io.renren.entity.TeachClassplanStudentfileEntity">
+        select * from teach_classplan_studentfile where classplan_id = #{classplanId}
+    </select>
+</mapper>

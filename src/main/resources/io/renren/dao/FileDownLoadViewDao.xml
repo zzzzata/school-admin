@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.FileDownLoadViewDao">
+    <!-- 为交付件的表的下载次数加1 -->
+    <update id="downloadTeachFile" parameterType="Long">
+       UPDATE teach_file SET download_num = download_num + 1 WHERE teach_file.id =#{teachFileId}
+    </update>
+
+    <!-- 为学员课程资料明细文件的下载次数加1 -->
+    <update id="downloadFileDetail" parameterType="Long">
+       UPDATE teach_student_files_detail SET download_num = download_num + 1 WHERE teach_student_files_detail.id =#{fileDetailId}
+    </update>
+
+    <!-- 为交付件的查看次数加1 -->
+    <update id="viewTeachFile" parameterType="Long">
+       UPDATE teach_file SET view_num = view_num + 1 WHERE teach_file.id =#{teachFileId}
+    </update>
+
+    <!-- 为学员课程资料明细文件的下载次数加1 -->
+    <update id="viewFileDetail" parameterType="Long">
+       UPDATE teach_student_files_detail SET view_num = view_num + 1 WHERE teach_student_files_detail.id =#{fileDetailId}
+    </update>
+</mapper>

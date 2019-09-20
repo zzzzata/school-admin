@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.NcSchoolLearningDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	nc_school_learning.learning_id AS learningId , 	nc_school_learning.learning_no AS learningNo , 	nc_school_learning.user_id AS userId , 	nc_school_learning.mobile AS mobile , 	nc_school_learning.dept_id AS deptId , 	nc_school_learning.nc_class_type AS ncClassType , 	nc_school_learning.dr AS dr , 	nc_school_learning.create_time AS createTime , 	nc_school_learning.ts AS ts , 	nc_school_learning.nc_school_id AS ncSchoolId , 	nc_school_learning.nc_school_name AS ncSchoolName 	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE 1=1 AND nc_school_learning.dr=0 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM nc_school_learning AS nc_school_learning
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  learning_id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="io.renren.entity.NcSchoolLearningEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND learning_id = #{learningId}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="io.renren.entity.NcSchoolLearningEntity">
+		select
+		<include refid="base_column"/>
+        ,sys_dept.`name` AS  deptName,users.user_id AS userId,nc_school_learning.user_name as userName
+		<include refid="base_from"/>
+        LEFT JOIN sys_dept sys_dept ON sys_dept.dept_id = nc_school_learning.dept_id
+        LEFT JOIN users users ON users.mobile = nc_school_learning.mobile
+		<include refid="base_where"/>
+		<if test="learningNo != null and learningNo.trim() != ''">
+			AND nc_school_learning.learning_no = #{learningNo}
+		</if>
+        <if test="mobile != null and mobile.trim() != ''">
+            AND nc_school_learning.mobile = #{mobile}
+        </if>
+		<if test="userName != null and userName.trim() != ''">
+          AND  nc_school_learning.user_name LIKE concat ('%',#{userName},'%')
+        </if>
+        <include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/>
+        LEFT JOIN sys_dept sys_dept ON sys_dept.dept_id = nc_school_learning.dept_id
+        LEFT JOIN users users ON users.mobile = nc_school_learning.mobile
+		<include refid="base_where"/>
+        <if test="learningNo != null and learningNo.trim() != ''">
+            AND nc_school_learning.learning_no = #{learningNo}
+        </if>
+        <if test="mobile != null and mobile.trim() != ''">
+            AND nc_school_learning.mobile = #{mobile}
+        </if>
+        <if test="userName != null and userName.trim() != ''">
+            AND  nc_school_learning.user_name LIKE concat ('%',#{userName},'%')
+        </if>
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="io.renren.entity.NcSchoolLearningEntity" useGeneratedKeys="true" keyProperty="learningId">
+		insert into nc_school_learning
+		(
+			  `learning_no`, `user_id`,`mobile`,`dept_id`,`nc_class_type`,`dr`,`create_time`,`nc_school_id`,`nc_school_name`)
+		values
+		(
+			#{learningNo},#{userId},#{mobile},#{deptId},#{ncClassType},0,#{createTime},#{ncSchoolId},#{ncSchoolName}
+
+		)
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="io.renren.entity.NcSchoolLearningEntity">
+		update nc_school_learning 
+		<set>
+			<if test="learningNo != null">`learning_no` = #{learningNo}, </if>
+			<if test="userId != null">`user_id` = #{userId}, </if>
+			<if test="mobile != null">`mobile` = #{mobile}, </if>
+			<if test="deptId != null">`dept_id` = #{deptId}, </if>
+			<if test="ncClassType != null">`nc_class_type` = #{ncClassType}, </if>
+			<if test="dr != null">`dr` = #{dr}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="ts != null">`ts` = #{ts}, </if>
+			<if test="ncSchoolId != null">`nc_school_id` = #{ncSchoolId}, </if>
+			<if test="ncSchoolName != null">`nc_school_name` = #{ncSchoolName}</if>
+		</set>
+		<include refid="base_where"/>
+		AND learning_id = #{learningId}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="io.renren.entity.NcSchoolLearningEntity">
+		UPDATE nc_school_learning 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND learning_id = #{id}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="io.renren.entity.NcSchoolLearningEntity">
+		UPDATE nc_school_learning 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND learning_id IN 
+		<foreach item="learningId" collection="ids" open="(" separator="," close=")">
+			#{learningId}
+		</foreach>
+	</update>
+
+    <select id="queryDetail" resultType="io.renren.pojo.NcSchoolLearningDetailPOJO">
+        SELECT
+            nsld.learning_detail_id,
+            nsld.courseclassplan_id as classplanId,
+            nsld.time_stamp,
+            nsc.courseclassplan_name as classplanName,
+            nsc.course_id,
+            nsc.course_name
+        FROM
+            `nc_school_learning_detail` nsld
+        LEFT JOIN nc_school_courseclassplan nsc ON nsc.courseclassplan_id = nsld.courseclassplan_id
+        WHERE
+            nsld.dr=0
+            AND
+            nsld.learning_id = #{learningId}
+    </select>
+
+    <select id="queryDetailTotal" resultType="int">
+        SELECT count(1)  FROM
+            `nc_school_learning_detail` nsld
+        LEFT JOIN nc_school_courseclassplan nsc ON nsc.courseclassplan_id = nsld.courseclassplan_id
+        WHERE
+            nsld.dr=0
+            AND
+            nsld.learning_id = #{learningId}
+    </select>
+</mapper>

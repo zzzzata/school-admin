@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hq.courses.dao.CsCourseLiveDetailsRecordDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	cs_course_live_details_record.live_record_id AS liveRecordId , 	cs_course_live_details_record.live_id AS liveId , 	cs_course_live_details_record.live_name AS liveName , 	cs_course_live_details_record.review_name AS reviewName , 	cs_course_live_details_record.review_url AS reviewUrl , 	cs_course_live_details_record.prepare_name AS prepareName , 	cs_course_live_details_record.prepare_url AS prepareUrl , 	cs_course_live_details_record.courseware_name AS coursewareName , 	cs_course_live_details_record.courseware_url AS coursewareUrl , 	cs_course_live_details_record.phase_id AS phaseId , 	cs_course_live_details_record.phase_name AS phaseName , 	cs_course_live_details_record.create_time AS createTime , 	cs_course_live_details_record.create_person AS createPerson , 	cs_course_live_details_record.update_time AS updateTime , 	cs_course_live_details_record.update_person AS updatePerson , 	cs_course_live_details_record.dr AS dr , 	cs_course_live_details_record.order_num AS orderNum , 	cs_course_live_details_record.course_id AS courseId , 	cs_course_live_details_record.sync_status AS syncStatus 	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE  cs_course_live_details_record.dr=0
+	</sql>
+	<sql id="select_query">
+		<if test="courseId != null and courseId > 0">
+			AND `course_id` = #{courseId}
+		</if>
+		<if test="liveId != null">
+			AND `live_id` = #{liveId}
+		</if>
+		<if test="liveName != null">
+			AND `live_name` = #{liveName}
+		</if>
+	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM cs_course_live_details_record AS cs_course_live_details_record
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  live_record_id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="com.hq.courses.entity.CsCourseLiveDetailsRecordEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND live_record_id = #{liveRecordId}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="com.hq.courses.entity.CsCourseLiveDetailsRecordEntity">
+		select
+		<include refid="base_column"/>
+		,sys_user.nick_name
+		<include refid="base_from"/>
+		left join hq_school.sys_user on cs_course_live_details_record.update_person = sys_user.user_id
+		<include refid="base_where"/>
+		<include refid="select_query"/>
+		<include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		<include refid="select_query"/>
+	</select>
+	<!--新增-->
+	<insert id="saveRecord" parameterType="com.hq.courses.entity.CsCourseLiveDetailsEntity" useGeneratedKeys="true" keyProperty="liveRecordId">
+		insert into cs_course_live_details_record
+		(
+				`live_id`, 				`live_name`, 				`review_name`, 				`review_url`, 				`prepare_name`, 				`prepare_url`, 				`courseware_name`, 				`courseware_url`, 				`phase_id`, 				`phase_name`, 				`create_time`, 				`create_person`, 				`update_time`, 				`update_person`, 				`dr`, 				`order_num`, 				`course_id`, 				`sync_status`		)
+		values
+		(
+															#{liveId}, 																			#{liveName}, 																			#{reviewName}, 																			#{reviewUrl}, 																			#{prepareName}, 																			#{prepareUrl}, 																			#{coursewareName}, 																			#{coursewareUrl}, 																			#{phaseId}, 																			#{phaseName}, 																			#{createTime}, 																			#{createPerson}, 																			#{updateTime}, 																			#{updatePerson}, 																			0, 																			#{orderNum}, 																			#{courseId}, 0)
+	</insert>
+</mapper>

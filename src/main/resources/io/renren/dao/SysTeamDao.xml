@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.dao.SysTeamDao">
+
+    <!-- 通用查询表头 -->
+    <sql id="base_column">
+        sys_team.id AS id ,
+        sys_team.name AS name ,
+        sys_team.parent_id AS parentId ,
+        sys_team.status AS status ,
+        sys_team.create_time AS createTime ,
+        sys_team.creator_id AS creatorId ,
+        sys_team.update_time AS updateTime ,
+        sys_team.editor_id AS editorId ,
+        sys_team.team_leader_id AS teamLeaderId ,
+        sys_team.team_leader_name AS teamLeaderName ,
+        sys_team.remark AS remark ,
+        sys_team.order_num AS orderNum
+    </sql>
+    <!-- 通用查询条件 -->
+    <sql id="base_where">
+        <if test="name != null and name.trim() != ''">
+            and sys_team.name like concat('%',#{name},'%')
+        </if>
+        <if test="levelLimit != null ">
+            and parent_id &gt;= #{levelLimit}
+        </if>
+        <if test="status != null and status.trim() != ''">
+            and status = #{status}
+        </if>
+    </sql>
+    <!-- 通用from -->
+    <sql id="base_from">
+    	 FROM sys_team AS sys_team
+	</sql>
+    <!-- 通用排序 -->
+    <sql id="base_order">
+    	 ORDER BY  id DESC
+	</sql>
+
+    <!--根据ID查询-->
+    <select id="queryById" resultType="map">
+        select
+        <include refid="base_column"/>
+        ,
+        (select p.name from sys_team p where p.id = sys_team.parent_id) as parentName ,
+        (select cu.nick_name from sys_user cu where cu.user_id = sys_team.creator_id) as creatorName,
+        (select eu.nick_name from sys_user eu where eu.user_id = sys_team.editor_id) as editorName
+        <include refid="base_from"/>
+        <where>
+           id = #{id}
+        </where>
+
+    </select>
+
+    <select id="queryObject" resultType="io.renren.entity.SysTeamEntity">
+        select
+        <include refid="base_column"/>
+        <include refid="base_from"/>
+        <where>
+            id = #{id}
+        </where>
+    </select>
+
+    <!--分页列表-->
+    <select id="getChildrenIdList" resultType="java.lang.Long">
+        select
+            id
+        <include refid="base_from"/>
+        <where>
+            1=1
+            <include refid="base_where"/>
+        </where>
+        <if test="teamIdList != null and teamIdList.size>0 ">
+            and parent_id in
+            <foreach collection="teamIdList" index="index" item="id" open="(" separator="," close=")">
+                #{id}
+            </foreach>
+        </if>
+    </select>
+
+
+    <!--分页列表-->
+    <select id="queryList" resultType="io.renren.entity.SysTeamEntity">
+        select
+        <include refid="base_column"/>
+        ,
+        (select p.name from sys_team p where p.id = sys_team.parent_id) as parentName ,
+        (select cu.nick_name from sys_user cu where cu.user_id = sys_team.creator_id) as creatorName,
+        (select eu.nick_name from sys_user eu where eu.user_id = sys_team.editor_id) as editorName
+        <include refid="base_from"/>
+        <where>
+            1=1
+            <include refid="base_where"/>
+        </where>
+        <if test="levelLimit != null ">
+            and parent_id &gt;= #{levelLimit}
+        </if>
+        <if test="teamName !=null ">
+            and `name` = #{teamName}
+        </if>
+        <if test="offset != null and limit != null">
+            limit #{offset}, #{limit}
+        </if>
+
+    </select>
+
+
+    <!--分页总数-->
+    <select id="queryTotal" resultType="int">
+        select count(1)
+        <include refid="base_from"/>
+        <where>
+            1=1
+            <include refid="base_where"/>
+        </where>
+    </select>
+    <!--新增-->
+    <insert id="save" parameterType="io.renren.entity.SysTeamEntity" useGeneratedKeys="true" keyProperty="id">
+		insert into sys_team
+		(
+				`name`,
+				`parent_id`,
+				`status`,
+				`create_time`,
+				`creator_id`,
+				`update_time`,
+				`editor_id`,
+				`team_leader_id`,
+				`team_leader_name`,
+				`remark`,
+				`order_num`
+		)
+		values
+		(
+				#{name},
+				#{parentId},
+				#{status},
+				#{createTime},
+				#{creatorId},
+				#{updateTime},
+				#{editorId},
+				#{teamLeaderId},
+				#{teamLeaderName},
+				#{remark},
+				#{orderNum}
+		)
+	</insert>
+
+    <!--修改-->
+    <update id="update" parameterType="io.renren.entity.SysTeamEntity">
+        update sys_team
+        <trim prefix="set" suffixOverrides="," suffix=" where id = #{id} ">
+            <if test="name != null">`name` = #{name}, </if>
+            <if test="parentId != null">`parent_id` = #{parentId}, </if>
+            <if test="status != null">`status` = #{status}, </if>
+            <if test="updateTime != null">`update_time` = #{updateTime}, </if>
+            <if test="editorId != null">`editor_id` = #{editorId}, </if>
+            <if test="teamLeaderId != null">`team_leader_id` = #{teamLeaderId}, </if>
+            <if test="teamLeaderName != null">`team_leader_name` = #{teamLeaderName}, </if>
+            <if test="remark != null">`remark` = #{remark}, </if>
+            <if test="orderNum != null">`order_num` = #{orderNum}, </if>
+        </trim>
+    </update>
+
+    <!--删除-->
+    <delete id="delete">
+        DELETE FROM sys_team
+        <include refid="base_where"/>
+        AND id = #{id}
+    </delete>
+
+    <!--批量删除-->
+    <delete id="deleteBatch">
+        DELETE FROM sys_team
+        <include refid="base_where"/>
+        AND id IN
+        <foreach item="id" collection="ids" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="queryListByParentId" resultType="io.renren.entity.SysTeamEntity">
+        SELECT
+        <include refid="base_column"/>
+        <include refid="base_from"/>
+        WHERE parent_id = #{parentId}
+    </select>
+
+ </mapper>

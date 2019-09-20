@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>学员考期表</title>
+#parse("sys/header.html")
+</head>
+<body>
+<div id="rrapp" v-cloak>
+	<div v-show="showList">
+		<div class="grid-btn">
+			<table class="table table-condensed" border="0">
+				<tr border="0">
+					<td><label for="name">报考时间</label></td>
+					<td><input type="text" class="form-control" v-model="q.examScheduleName" @keyup.enter="query"
+							   readonly="readonly" placeholder="点击选择报考时间" @click="selectExamSchedule"></td>
+					<td><label for="name">手机</label></td>
+					<td><input type="text" class="form-control" v-model="q.mobile" @keyup.enter="query"
+							   @keyup.enter="query"></td>
+					<td><label for="name">姓名</label></td>
+					<td><input type="text" class="form-control" v-model="q.nickName" @keyup.enter="query"
+							   @keyup.enter="query" ></td>
+					<td><label for="name">课程编码</label></td>
+					<td><input type="text" class="form-control" v-model="q.courseNo" @keyup.enter="query"
+							   @keyup.enter="query"></td>
+					<td><label for="name">学习状态</label></td>
+					<td>
+						<select class="form-control" v-model="q.learnState" @keyup.enter="query">
+							<option value="">全部</option>
+							<option v-for="option in selectData.learnStateList" v-bind:value="option.value">{{ option.name }}</option>
+						</select>
+					</td>
+					<td><label for="name">考试状态</label></td>
+					<td>
+						<select class="form-control" v-model="q.examState" @keyup.enter="query">
+							<option value="">全部</option>
+							<option v-for="option in selectData.examStateList" v-bind:value="option.value">{{ option.name }}</option>
+						</select>
+					</td>
+				</tr>
+				<tr border="0">
+					<td><label for="name">产品线</label></td>
+					<td><input type="text" class="form-control" v-model="q.productName" @keyup.enter="query"
+							   readonly="readonly" placeholder="点击选择产品线" @click="productShowQuery"></td>
+					<td><label for="name">班级</label></td>
+					<td><input type="text" class="form-control" v-model="q.className" @keyup.enter="query"
+							   readonly="readonly" placeholder="点击选择班级" @click="classLayerShowQuery"></td>
+					<td><label for="name">班主任</label></td>
+					<td>
+						<input type="text" class="form-control" id="query-classTeacherName" v-model="q.teacherName" readonly="readonly" placeholder="选择班主任" @click="classTeacherLayerShow">
+					</td>
+					<td><label for="name">省份</label></td>
+					<td><input type="text" class="form-control" v-model="q.areaName" readonly="readonly"
+							   @keyup.enter="query" placeholder="点击选择省份" @click="areaLayerShow"></td>
+					<td><label for="name">专业</label></td>
+					<td><input type="text" class="form-control" v-model="q.professionName" readonly="readonly"
+							   @keyup.enter="query" placeholder="点击选择专业" @click="professionLayerShow"></td>
+					<td><label for="name">层次</label></td>
+					<td><input type="text" class="form-control" v-model="q.levelName" @keyup.enter="query"
+							   readonly="readonly" placeholder="点击选择层次" @click="levelLayerShow"></td>
+				</tr>
+				<tr border="0">
+					<td><label for="name">课程</label></td>
+					<td><input type="text" class="form-control" v-model="q.courseName" @keyup.enter="query"
+							   readonly="readonly" placeholder="点击选择课程" @click="selectCourse"></td>
+					<td><label for="name">班型</label></td>
+					<td><input type="text" class="form-control" v-model="q.classTypeName" @keyup.enter="query"
+					readonly="readonly" placeholder="点击选择班型" @click="classTypeLayerShow"></td>
+					<td><label for="name">报读日期</label></td>
+					<td><input type="text" class="form-control order-Time" id="orderStartTime" v-model="q.orderStartTime"
+							   readonly="readonly" placeholder="开始日期"/></td>
+					<td><label for="name"></label></td>
+					<td><input type="text" class="form-control order-Time" id="orderEndTime" v-model="q.orderEndTime" style="margin-left: -70px"
+																			  readonly="readonly" placeholder="结束日期"/></td>
+					</td>
+
+				</tr>
+			</table>
+			<a class="btn btn-default" @click="clearQuery">&nbsp;重置</a>
+			<a class="btn btn-primary" @click="query"><i class='fa fa-search'></i>&nbsp;查询</a>
+			<a class="btn btn-danger" onclick="hq.ui.csv.exportDataCsv(null);" style="float: right;">导出</a>
+		</div>
+	    <table id="jqGrid"></table>
+	    <div id="jqGridPager"></div>
+    </div>
+</div>
+
+<script src="${rc.contextPath}/js/student/examinationdate.js?_${date.systemTime}"></script>
+#parse("layer/examScheduleLay.html")
+#parse("layer/classLay.html") #parse("layer/classTypeLay.html")
+#parse("layer/productLay.html")
+#parse("layer/professionLay.html") #parse("layer/userInfoLay.html")
+#parse("layer/levelLay.html") #parse("layer/areaLay.html")
+#parse("layer/courseLay.html")
+#parse("layer/teacherLay.html")
+</body>
+</html>

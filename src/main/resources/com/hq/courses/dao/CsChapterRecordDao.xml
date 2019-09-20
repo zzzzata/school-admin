@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hq.courses.dao.CsChapterRecordDao">
+
+		
+	<!-- 通用查询表头 -->
+	<sql id="base_column">
+	cs_chapter_record.chapter_record_id AS chapterRecordId ,cs_chapter_record.chapter_id AS chapterId , 	cs_chapter_record.chapter_name AS chapterName , 	cs_chapter_record.chapter_no AS chapterNo , 	cs_chapter_record.course_id AS courseId ,
+		cs_chapter_record.update_time AS updateTime , 	cs_chapter_record.create_time AS createTime , 	cs_chapter_record.dr AS dr , 	cs_chapter_record.order_num AS orderNum , 	cs_chapter_record.create_user_id AS createUserId	</sql>
+	<!-- 通用查询条件 -->
+	<sql id="base_where">
+    	WHERE 1=1 	</sql>
+	<!-- 通用from -->
+	<sql id="base_from">
+    	 FROM cs_chapter_record AS cs_chapter_record
+	</sql>
+	<!-- 通用排序 -->
+	<sql id="base_order">
+    	 ORDER BY  chapter_record_id DESC
+	</sql>
+	
+	<!--根据ID查询-->
+	<select id="queryObject" resultType="com.hq.courses.entity.CsChapterRecordEntity">
+		select 
+      	<include refid="base_column"/>
+		<include refid="base_from"/>
+		<include refid="base_where"/>
+		AND chapter_record_id = #{chapterRecordId}
+	</select>
+	
+	<!--分页列表-->
+	<select id="queryList" resultType="com.hq.courses.entity.CsChapterRecordEntity">
+		select
+		<include refid="base_column"/>
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+        <include refid="base_order"/>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!--分页总数-->
+ 	<select id="queryTotal" resultType="int">
+		select count(1) 
+		<include refid="base_from"/> 
+		<include refid="base_where"/>
+	</select>
+	<!--新增-->
+	<insert id="save" parameterType="com.hq.courses.entity.CsChapterRecordEntity" useGeneratedKeys="true" keyProperty="chapterRecordId">
+		insert into cs_chapter_record
+		(
+			 `chapter_id`, `chapter_name`,`chapter_no`,`course_id`,`update_time`,`create_time`,`dr`,`order_num`,`create_user_id`
+		)
+		values
+		(
+			#{chapterId},#{chapterName},#{chapterNo},#{courseId}, #{updateTime},#{createTime}, #{dr},#{orderNum},#{createUserId}
+		)
+	</insert>
+	
+	<!--修改-->
+	<update id="update" parameterType="com.hq.courses.entity.CsChapterRecordEntity">
+		update cs_chapter_record 
+		<set>
+			<if test="chapterName != null">`chapter_name` = #{chapterName}, </if>
+			<if test="chapterNo != null">`chapter_no` = #{chapterNo}, </if>
+			<if test="courseId != null">`course_id` = #{courseId}, </if>
+			<if test="updateTime != null">`update_time` = #{updateTime}, </if>
+			<if test="createTime != null">`create_time` = #{createTime}, </if>
+			<if test="dr != null">`dr` = #{dr}, </if>
+			<if test="createUserId != null">`create_user_id` = #{createUserId}, </if>
+			<if test="orderNum != null">`order_num` = #{orderNum}</if>
+		</set>
+		<include refid="base_where"/>
+		AND chapter_record_id = #{chapterRecordId}
+	</update>
+	
+	<!--删除-->
+	<update id="delete" parameterType="com.hq.courses.entity.CsChapterRecordEntity">
+		UPDATE cs_chapter_record 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND chapter_record_id = #{id}
+	</update>
+	
+	<!--批量删除-->
+	<update id="deleteBatch" parameterType="com.hq.courses.entity.CsChapterRecordEntity">
+		UPDATE cs_chapter_record 
+		<set> dr = 1 </set>
+		<include refid="base_where"/>
+		AND chapter_record_id IN
+		<foreach item="chapterId" collection="ids" open="(" separator="," close=")">
+			#{chapterId}
+		</foreach>
+	</update>
+
+    <select id="queryPojoList" resultType="com.hq.courses.pojo.CsChapterRecordPOJO">
+        SELECT
+            <include refid="base_column"/> ,cs_chapter_record.create_user_id AS userId,cs_course.course_name
+       <include refid="base_from"></include>
+        LEFT JOIN cs_course cs_course ON cs_course.course_id = cs_chapter_record.course_id
+        <include refid="base_where"></include>
+        <if test="courseName != null and courseName.trim() != ''">
+            AND cs_course.course_name LIKE CONCAT('%', #{courseName}, '%')
+        </if>
+        <if test="chapterNo != null and chapterNo.trim() != ''">
+            AND cs_chapter_record.chapter_no = #{chapterNo}
+        </if>
+        <if test="chapterName != null and chapterName.trim() != ''">
+            AND cs_chapter_record.chapter_name LIKE CONCAT('%', #{chapterName}, '%')
+        </if>
+        ORDER BY cs_chapter_record.create_time DESC
+    </select>
+
+    <select id="queryPojoTotal" resultType="int">
+        SELECT
+            COUNT(1)
+            <include refid="base_from"></include>
+            LEFT JOIN cs_course cs_course ON cs_course.course_id = cs_chapter_record.course_id
+            <include refid="base_where"></include>
+            <if test="courseName != null and courseName.trim() != ''">
+                AND cs_course.course_name LIKE CONCAT('%', #{courseName}, '%')
+            </if>
+            <if test="chapterNo != null and chapterNo.trim() != ''">
+                AND cs_chapter_record.chapter_no = #{chapterNo}
+            </if>
+            <if test="chapterName != null and chapterName.trim() != ''">
+                AND cs_chapter_record.chapter_name LIKE CONCAT('%', #{chapterName}, '%')
+            </if>
+    </select>
+</mapper>
